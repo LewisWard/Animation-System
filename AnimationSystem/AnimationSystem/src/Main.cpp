@@ -5,18 +5,27 @@
 
 int main(int argc, char *argv[])
 {
-	initSDL();
+	// setup SDL, delta time and load the application
+	bool gameloop = initSDL();
 	Application application;
+	initTimerDT();
+
+	// setup GLEW
 	initGLEW();
 
-	bool gameloop = true;
+	// delta time
+	float deltaTime;
 
-
+	// gameloop
 	while (gameloop)
 	{
-		application.update();
+		// update the delta time
+		deltaTime = updateTimerDT();
+
+		// update and draw the application
+		application.update(deltaTime);
 		application.draw();
-		gameloop = false;
+		gameloop = application.getGameloop();
 	}
 
 	application.~Application();
