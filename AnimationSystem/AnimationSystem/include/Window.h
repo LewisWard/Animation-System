@@ -10,6 +10,7 @@
 #include "glm/glm.hpp"
 #include <iostream>
 #include <Windows.h>
+#include <cstdint>
 
 // This header file has been taken but modified from my PGAG Assignment 1 project
 

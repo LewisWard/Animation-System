@@ -4,10 +4,11 @@
 #pragma once
 #include "Events.h"
 #include "gl/Program.h"
+#include "Mesh.h"
 #include <memory>
 
 //----------------------------------------------------------------------------------------------------------------------
-/// \brief  The application 
+/// \brief  The application, alomst everything is called or run from within this class
 //----------------------------------------------------------------------------------------------------------------------
 class Application
 {
@@ -32,4 +33,5 @@ public:
 private:
 	Window m_window; ///< demo window
 	Event m_events;  ///< demo user input events
+	std::shared_ptr<Mesh> m_mesh;
 };

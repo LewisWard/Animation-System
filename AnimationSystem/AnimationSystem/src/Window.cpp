@@ -105,7 +105,7 @@ Window::Window()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	// multiply matrix with orthographic matrix
-	glOrtho(0, m_winW, m_winH, 0, 0, 50);
+	glOrtho(0, m_winW, m_winH, 0, 0, -50);
 	// modelview matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
