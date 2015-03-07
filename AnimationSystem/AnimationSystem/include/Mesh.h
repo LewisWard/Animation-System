@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include <vector>
 #include <fstream>   
+#define NUM_OF_FRAMES 24.0
 
 ///\brief vertex data
 struct vertNormal

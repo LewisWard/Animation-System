@@ -7,7 +7,7 @@
 
 Application::Application()
 {
-	m_mesh = std::make_shared<Mesh>(ANIMPATH"testBig.amesh");
+	m_mesh = std::make_shared<Mesh>(ANIMPATH"bodyBig2.amesh");
 
 	m_currentFrame = 0.0f;
 }
@@ -23,38 +23,34 @@ void Application::draw()
 	// clear the colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//for (int i = 0; i < m_mesh.get()->getMesh().clusters.size(); i++)
-	//for (int i = 0; i < m_mesh.get()->getMesh().deformed.size(); i++)
+
+	glm::vec3 mat;
+
+	// get the Trajectory joint
+	glm::vec3 vec = m_mesh.get()->getMesh().deformed[m_mesh.get()->getMesh().deformed.size() - NUM_OF_FRAMES].V;
+	vec.x += 100.0f;
+	vec.y += 400.0f;
+	vec.z = 1.0f;
+
+	// draw joints
+	for (size_t i = 0; i < m_mesh.get()->getMesh().deformed.size() - NUM_OF_FRAMES; i += NUM_OF_FRAMES)
 	{
-		// draw the joint
-		//glm::mat4x3 mat = m_mesh.get()->getMesh().clusters[i].bindPose;
-		//mat[3][0] += 100.0f;
-		//mat[3][1] += 100.0f;
+		mat = m_mesh.get()->getMesh().deformed[i + m_currentFrame].V;
 
-		glm::vec3 mat;
-		glm::vec3 vec = m_mesh.get()->getMesh().deformed[0].V;
-		vec.x += 100.0f;
-		vec.y += 400.0f;
-		vec.z = 1.0f;
+		mat.x += 100.0f;
+		mat.y += 400.0f;
+		mat.z = 1.0f;
 
-		for(size_t i = 0; i < m_mesh.get()->getMesh().deformed.size(); i+= 24)
-		{
-			mat = m_mesh.get()->getMesh().deformed[i + m_currentFrame].V;
-
-			mat.x += 100.0f;
-			mat.y += 400.0f;
-			mat.z = 1.0f;
-
-			glBegin(GL_POINTS);
+		glBegin(GL_POINTS);
 			glColor3f(1.0f, 1.0f, 0.0f);
 			glVertex3f(mat.x, mat.y, mat.z);
 			glColor3f(0.0f, 1.0f, 0.0f);
-			//glVertex3f(vec.x, vec.y, vec.z);
-			glEnd();
-		}
+			glVertex3f(vec.x, vec.y, vec.z);
+		glEnd();
 
 		std::cout << m_currentFrame << " " << mat.x << " " << mat.y << " " << mat.z << std::endl;
 	}
+	
 
 	// disable OpenGL textures and depth testing
 	glDisable(GL_TEXTURE_2D);
@@ -69,9 +65,9 @@ void Application::update(float dt)
 	int eventCode = m_events.update();
 
 	// go to the next frame
-	m_currentFrame += dt * 24;
+	m_currentFrame += dt * NUM_OF_FRAMES;
 
 	// reset the frame
-	if (m_currentFrame > 24.0f)
+	if (m_currentFrame > NUM_OF_FRAMES)
 		m_currentFrame = 0.0f;
 }
