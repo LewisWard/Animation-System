@@ -5,6 +5,8 @@
 #include "PGAGExporter.h"
 #include <maya/MItDag.h>
 #include <maya/MFnDagNode.h>
+#include <maya/MTypes.h>
+
 
 bool animation::write(const char* filename)
 {
@@ -26,10 +28,33 @@ bool animation::write(const char* filename)
 		// write to file
 		for (uint32_t i = 0; i < m_animation.size(); i++)
 		{
+			// get the name of the parent path (i.e Hips etc.)
+			MString parentPathName(m_animation[i].parentPath.partialPathName());
 
+			uint32_t parentIndex = hipsIndex;
+
+			// make sure there is a parent
+			if (parentPathName.numChars())
+			{
+				for (uint32_t l = 0; l < m_animation.size(); l++)
+				{
+					if (parentPathName == m_animation[l].path.partialPathName())
+					{
+						parentIndex = l;
+						break;
+					}
+				}
+				// as it has a parent, add joint position to its parent (this could be done within the program, 
+				// but is easier to perform here). MAKE SURE FREEZE TRANSFORMS HAS BEEN DONE FOR EXPORT!
+				m_animation[i].positions[f].x += m_animation[parentIndex].positions[f].x;
+				m_animation[i].positions[f].y += m_animation[parentIndex].positions[f].y;
+				m_animation[i].positions[f].z += m_animation[parentIndex].positions[f].z;
+			}
+
+			// write results to file
 			ouputFileStream << f << " "
 											<< m_animation[i].positions[f].x << " "
-											<< m_animation[i].positions[f].y << " "
+											<< -m_animation[i].positions[f].y <<" " // need to invert as in the program Y is the otherway round
 											<< m_animation[i].positions[f].z << " "
 											<< m_animation[i].rotations[f].x << " "
 											<< m_animation[i].rotations[f].y << " "
