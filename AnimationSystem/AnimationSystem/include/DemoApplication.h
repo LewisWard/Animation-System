@@ -1,6 +1,18 @@
 // Author  : Lewis Ward
 // Program : Animation System Tech Demo
 // Date    : 12/02/2015
+
+/*
+	This program will allow for users to export a Maya animation with the custom Maya exporter.
+
+	Feature list:
+		Display anaimation cycle.
+		Perform anaiamtion blending between different cycles (i.e walking into jogging and running)
+		Allow user to move camera around the sence.
+		Allow user input to control character animation.
+		Allow input from Xbox Controller
+*/
+
 #pragma once
 #include "Events.h"
 #include "gl/Program.h"
@@ -34,4 +46,5 @@ private:
 	Window m_window; ///< demo window
 	Event m_events;  ///< demo user input events
 	std::shared_ptr<Mesh> m_mesh;
+	float m_currentFrame;
 };

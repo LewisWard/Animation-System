@@ -51,7 +51,7 @@ Mesh::Mesh(const char* rig)
 		{
 			ifs >> frameNumber
 				  >> position.x >> position.y >> position.z
-					>> rotation.x >> rotation.y >> rotation.z >> rotation.w;
+				  >> rotation.x >> rotation.y >> rotation.z >> rotation.w;
 			
 			// store the values
 			positions[frame].x = position.x;
@@ -77,15 +77,11 @@ Mesh::Mesh(const char* rig)
 	// Now sort the data to have the correct transforms with the correct frames
 	if (read)
 	{
-		// store the original mesh vertices and indices
-		//m_rMesh.originalMesh->verts = ;
-		//m_rMesh.originalMesh->indices = ;
-
 		// store the correct joint data into the correct joint cluster
 		m_rMesh.clusters.resize(joints);
 		for (size_t j = 0; j < joints; ++j)
 		{
-			int index = j * joints;
+			int index = j * joints + 1;
 
 			// set the joint index
 			m_rMesh.clusters[j].joint = j;
@@ -98,11 +94,36 @@ Mesh::Mesh(const char* rig)
 
 			m_rMesh.clusters[j].bindPose = bind;
 
-			// assign which vertices are parented to this joint
-			//m_rMesh.clusters[j].verts = ;
+			m_rMesh.deformed.resize(joints * frames);
+
+			int i = 0;
+			int k = 0;
+			// store the data into each joint and all of its frame.
+			// (i.e joint 1 for all frames, joint 2 for all frames etc...)
+			for (size_t f = 0; f < joints * frames; ++f)
+			{
+				// every time the number of joints is done reset 
+				if (f % frames == 0)
+				{
+					i = 0;
+					k++;
+				}
+
+				// start at the Hips joint 
+				int ii = (i * joints + k);
+
+				if (ii > positions.size() - 1)
+					ii = positions.size() - 1;
+
+				m_rMesh.deformed[f].V.x = positions[ii].x;
+				m_rMesh.deformed[f].V.y = positions[ii].y;
+				m_rMesh.deformed[f].V.z = positions[ii].z;
+				std::cout << i << " " << k << std::endl;
+				i++;
+			}
 		}
 	}
-	
+
 }
 Mesh::~Mesh()
 {
