@@ -24,15 +24,15 @@ bool animation::write(const char* filename)
 	{
 		// get the frame
 		extractFrame(f);
-
+	
 		// write to file
 		for (uint32_t i = 0; i < m_animation.size(); i++)
 		{
 			// get the name of the parent path (i.e Hips etc.)
 			MString parentPathName(m_animation[i].parentPath.partialPathName());
-
+			
 			uint32_t parentIndex = hipsIndex;
-
+			
 			// make sure there is a parent
 			if (parentPathName.numChars())
 			{
@@ -50,7 +50,7 @@ bool animation::write(const char* filename)
 				m_animation[i].positions[f].y += m_animation[parentIndex].positions[f].y;
 				m_animation[i].positions[f].z += m_animation[parentIndex].positions[f].z;
 			}
-
+	
 			// write results to file
 			ouputFileStream << f << " "
 											<< m_animation[i].positions[f].x << " "

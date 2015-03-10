@@ -167,6 +167,7 @@ struct animation
 		}
 
 		// reparent the hips to the trajectory node
+		// NOTE : if no joint is called Trajectory, the plugin will crash!!
 		m_animation[hipsIndex].extractHipsFrame(frame, trajectory);
 
 		// copy the trajectory into the root transform
