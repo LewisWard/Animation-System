@@ -7,12 +7,32 @@
 
 Application::Application()
 {
-	m_mesh = std::make_shared<Mesh>(ANIMPATH"bodyBig2.amesh");
+	// setup GLEW, if falis quit application
+	if (!initGLEW())
+	{
+		m_events.forceQuit();
+	}
+	else
+	{
+		m_mesh = std::make_shared<Mesh>(ANIMPATH"bodyBig2.amesh");
 
-	m_currentFrame = 0.0f;
+		m_currentFrame = 0.0f;
+
+		m_program = new gls::Program();
+
+		// create an array of all shaders to load
+		gls::Shader shaders[] = {
+			gls::Shader("shaders/joint.vtx.glsl", gls::sVERTEX), ///< joint
+			gls::Shader("shaders/joint.pix.glsl", gls::sFRAGMENT), ///< joint
+		};
+		
+		m_program->create(&shaders[0], &shaders[1]);
+	}
 }
 Application::~Application()
 {
+	delete m_program;
+	m_program = nullptr;
 }
 void Application::draw()
 {
@@ -23,6 +43,17 @@ void Application::draw()
 	// clear the colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glm::mat4x4 matTest;
+	matTest = glm::matrixCompMult(matTest, matTest);
+
+	// bind the program
+	m_program->bind();
+	// shader unifroms
+	m_program->uniform_Matrix4("mvp", 1, false, matTest);
+	// draw the menu
+	m_mesh->draw();
+	// unbind program and texture
+	m_program->unbind();
 
 	glm::vec3 mat;
 

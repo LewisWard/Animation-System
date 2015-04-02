@@ -50,4 +50,5 @@ private:
 	Event m_events;  ///< demo user input events
 	std::shared_ptr<Mesh> m_mesh;
 	float m_currentFrame;
+	gls::Program* m_program;
 };
