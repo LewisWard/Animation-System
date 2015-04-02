@@ -7,7 +7,7 @@
 bool initSDL()
 {
 	// initialisation of SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
 		// initialisation failed
 		std::cout << "Failed to initialise SDL" << std::endl;

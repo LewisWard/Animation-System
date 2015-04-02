@@ -34,6 +34,10 @@ public:
 	inline bool playState()
 	{ return m_playState; }
 
+	///\brief force quit the program
+	inline void forceQuit()
+	{ m_playState = false; }
+
 	///\brief update mouse position
 	///\return math::vec2 new mouse position
 	inline glm::vec2 mouseUpdate()

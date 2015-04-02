@@ -76,9 +76,22 @@ void gls::Program::uniform_1i(const char* uniformName, float value)
 void gls::Program::uniform_4f(const char* uniformName, float floatZero, float floatOne, float floatTwo, float floatThree)
 {
 	glUniform4f(glGetUniformLocation(program(), uniformName), floatZero, floatOne, floatTwo, floatThree);
-
 }
 void gls::Program::uniform_Matrix4(const char* uniformName, size_t count, bool transpose, float mvpFloat[])
 {
 	glUniformMatrix4fv(glGetUniformLocation(program(), uniformName), count, transpose, mvpFloat);
+}
+
+///// ------------------------------------- GLM LIBRARY VERSIONS ------------------------------------- /////
+void gls::Program::uniform_Matrix4(const char* uniformName, size_t count, bool transpose, glm::mat4x4 matrix)
+{
+	glUniformMatrix4fv(glGetUniformLocation(program(), uniformName), count, transpose, glm::value_ptr(matrix));
+}
+void gls::Program::uniform_3f(const char* uniformName, glm::vec3 vector)
+{
+	glUniform4f(glGetUniformLocation(program(), uniformName), vector.x, vector.y, vector.z, 0.0f);
+}
+void gls::Program::uniform_4f(const char* uniformName, glm::vec4 vector)
+{
+	glUniform4f(glGetUniformLocation(program(), uniformName), vector.x, vector.y, vector.z, vector.w);
 }
