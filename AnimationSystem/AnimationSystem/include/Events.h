@@ -12,6 +12,7 @@ enum events
 	kNONE, ///< nothing pressed
 	kSpace, ///< Space bar 
 	kMDL, kMDM, kMDR, ///< Mouse Down Left/Middle/Right
+	kCtrl, kAlt ///< left control / left Alt
 };
 
 //----------------------------------------------------------------------------------------------------------------------

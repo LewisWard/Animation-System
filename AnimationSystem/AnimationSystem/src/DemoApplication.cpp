@@ -16,6 +16,8 @@ Application::Application()
 	{
 		m_mesh = std::make_shared<Mesh>(ANIMPATH"bodyBig2.amesh");
 
+		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
+
 		m_currentFrame = 0.0f;
 
 		m_program = new gls::Program();
@@ -43,15 +45,29 @@ void Application::draw()
 	// clear the colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glm::mat4x4 matTest;
-	matTest = glm::matrixCompMult(matTest, matTest);
+	// get the MVP martix
+	glm::mat4x4 MVP;
+	glm::mat4x4 V = m_camera.get()->viewMatrix();
+	glm::mat4x4 P = m_camera.get()->projectionMatrix();
+	glm::mat4 m_model;
+	m_model[3].x = -2.0f;
+
+	glm::mat4x4 MV = V * m_model;
+	MVP = P * MV;
+
+	std::printf("%4.2f %4.2f %4.2f %4.2f \n%4.2f %4.2f %4.2f %4.2f \n%4.2f %4.2f %4.2f %4.2f \n%4.2f %4.2f %4.2f %4.2f\n", 
+							MVP[0].x, MVP[0].y, MVP[0].z, MVP[0].w,
+							MVP[1].x, MVP[1].y, MVP[1].z, MVP[1].w,
+							MVP[2].x, MVP[2].y, MVP[2].z, MVP[2].w,
+							MVP[3].x, MVP[3].y, MVP[3].z, MVP[3].w);
 
 	// bind the program
 	m_program->bind();
-	// shader unifroms
-	m_program->uniform_Matrix4("mvp", 1, false, matTest);
-	// draw the menu
-	m_mesh->draw();
+		// shader unifroms
+	m_program->uniform_Matrix4("mvp", 1, false, MVP);
+		// draw the menu
+		for (size_t i = 0; i < m_mesh.get()->getMesh().deformed.size() - NUM_OF_FRAMES; i += NUM_OF_FRAMES)
+		m_mesh->draw(i);
 	// unbind program and texture
 	m_program->unbind();
 
@@ -79,7 +95,7 @@ void Application::draw()
 			glVertex3f(vec.x, vec.y, vec.z);
 		glEnd();
 
-		std::cout << m_currentFrame << " " << mat.x << " " << mat.y << " " << mat.z << std::endl;
+		//std::cout << m_currentFrame << " " << mat.x << " " << mat.y << " " << mat.z << std::endl;
 	}
 	
 
@@ -92,6 +108,9 @@ void Application::draw()
 }
 void Application::update(float dt)
 {
+	m_camera->update(dt, m_events);
+	//m_camera.get()->update(dt, m_events);
+
 	// get lastest event 
 	int eventCode = m_events.update();
 

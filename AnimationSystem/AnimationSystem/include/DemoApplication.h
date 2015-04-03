@@ -17,8 +17,8 @@
 */
 
 #pragma once
-#include "Events.h"
 #include "gl/Program.h"
+#include "Camera.h"
 #include "Mesh.h"
 #include <memory>
 
@@ -51,4 +51,5 @@ private:
 	std::shared_ptr<Mesh> m_mesh;
 	float m_currentFrame;
 	gls::Program* m_program;
+	std::shared_ptr<Camera> m_camera;
 };

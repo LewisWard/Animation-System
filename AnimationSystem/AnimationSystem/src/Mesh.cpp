@@ -42,6 +42,10 @@ Mesh::Mesh(const char* rig)
 		positions.resize(joints * frames);
 		rotations.resize(joints * frames);
 		m_rMesh.clusters.resize(joints);
+		m_indices.resize(positions.size());
+
+		for (size_t i = 0; i < m_indices.size(); ++i)
+			m_indices[i] = i;
 
 		std::cout << frames << std::endl << joints << std::endl;
 
@@ -124,8 +128,102 @@ Mesh::Mesh(const char* rig)
 		}
 	}
 
+	// genereate a buffer
+	glGenBuffers(1, &m_vbo);
+	glGenBuffers(1, &m_ibo);
+	// bind
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormal)*m_rMesh.deformed.size(), &m_rMesh.deformed[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_indices.size(), &m_indices[0], GL_STATIC_DRAW);
+	// unbind
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 }
 Mesh::~Mesh()
 {
 	m_rMesh.originalMesh = nullptr;
+	glDeleteBuffers(1, &m_vbo);
+}
+void Mesh::draw()
+{
+	// enable vertex data
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+
+	//Const foat pointer that points to a offset of NULL
+	const float* coordinate = 0;
+	// enable vertex array
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertNormal), coordinate);
+	glEnableVertexAttribArray(0);
+
+	// enable normal
+	glVertexAttribPointer(1, 3, GL_FLOAT, true, sizeof(vertNormal), coordinate + 4);
+	glEnableVertexAttribArray(1);
+
+	// draw the indexed triangles from the VBO
+	glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, 0);
+
+	// disable editing of array
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+
+	// unbind buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+void Mesh::draw(int frame)
+{
+	// enable vertex data
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+
+	//Const foat pointer that points to a offset of NULL
+	const float* coordinate = 0;
+	// enable vertex array
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertNormal), coordinate);
+	glEnableVertexAttribArray(0);
+
+	// enable normal
+	glVertexAttribPointer(1, 3, GL_FLOAT, true, sizeof(vertNormal), coordinate + 4);
+	glEnableVertexAttribArray(1);
+
+	// draw, based upon: http://stackoverflow.com/questions/9431923/using-an-offset-with-vbos-in-opengl
+	glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, (void*)(frame * sizeof(GLuint)));
+
+	// disable editing of array
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+
+	// unbind buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+void Mesh::fetchDraw(int offset)
+{
+	// enable vertex data
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+
+	//Const foat pointer that points to a offset of NULL
+	const float* coordinate = 0;
+	// enable vertex array
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(vertNormal), coordinate);
+	glEnableVertexAttribArray(0);
+
+	// enable normal
+	glVertexAttribPointer(1, 3, GL_FLOAT, true, sizeof(vertNormal), coordinate + 4);
+	glEnableVertexAttribArray(1);
+
+	// draw, based upon: http://stackoverflow.com/questions/9431923/using-an-offset-with-vbos-in-opengl
+	glDrawElementsBaseVertex(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, 0, offset);
+
+	// disable editing of array
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+
+	// unbind buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

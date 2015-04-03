@@ -58,9 +58,18 @@ public:
 	/// \brief  dtor
 	~Mesh();
 
+	void draw();
+
+	void draw(int frame);
+
+	void fetchDraw(int offset);
+
 	inline rigidSkinnedMesh getMesh()
 	{ return m_rMesh; }
 
 private:
 	rigidSkinnedMesh m_rMesh;
+	uint32_t m_vbo;
+	uint32_t m_ibo;
+	std::vector<int> m_indices;
 };

@@ -24,6 +24,10 @@ int Event::update()
 		case SDL_KEYDOWN:
 				if(SDLK_SPACE == m_event.key.keysym.sym)
 				{return kSpace;}
+				if (SDLK_LCTRL == m_event.key.keysym.sym)
+				{ return kCtrl; }
+				if (SDLK_LALT == m_event.key.keysym.sym)
+				{ return kAlt; }
 				// key that I'm not worried about has been pressed
 				return kNONE;
 			break;
