@@ -81,6 +81,10 @@ Mesh::Mesh(const char* rig)
 	// Now sort the data to have the correct transforms with the correct frames
 	if (read)
 	{
+		// store number of frames and joints
+		m_frames = frames;
+		m_joints = joints;
+
 		// set the model martix to the Trajectory joint
 		m_modelMatrix[3].x = positions[0].x;
 		m_modelMatrix[3].y = positions[0].y;
@@ -195,7 +199,7 @@ void Mesh::draw(int frame)
 	glEnableVertexAttribArray(1);
 
 	// draw, based upon: http://stackoverflow.com/questions/9431923/using-an-offset-with-vbos-in-opengl
-	glDrawElements(GL_POINTS, m_indices.size(), GL_UNSIGNED_INT, (void*)(frame * sizeof(GLuint)));
+	glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, (void*)(frame * sizeof(GLuint)));
 
 	// disable editing of array
 	glDisableVertexAttribArray(1);

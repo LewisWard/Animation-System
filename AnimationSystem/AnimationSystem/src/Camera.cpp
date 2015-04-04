@@ -7,9 +7,9 @@ Camera::Camera(float windowW, float windowH)
 {
 	m_hAngle = 0.0f;
 	m_vAngle = 0.0f;
-	m_distance = -6.0f;
+	m_distance = -75.0f;
 
-	m_position = glm::vec3(0.0f, -1.0f, m_distance);
+	m_position = glm::vec3(0.0f, 0.0f, m_distance);
 	m_dirX = glm::vec3(1.0f, 0.0f, 0.0f);
 	m_dirY = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -52,7 +52,7 @@ void Camera::update(float dt, Event& events)
 		horizontalMove(dt, xDiff);
 	}
 
-	std::cout << m_distance << " " << xDiff << " " << yDiff << std::endl;
+	//std::cout << m_distance << " " << xDiff << " " << yDiff << std::endl;
 
 	// apply zoom
 	m_position.z = m_distance;

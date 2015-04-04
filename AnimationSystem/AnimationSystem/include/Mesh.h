@@ -73,10 +73,18 @@ public:
 	inline void setModelMatrix(glm::mat4 matrix)
 	{ m_modelMatrix = matrix; }
 
+	inline int numberOfFrames()
+	{ return m_frames; }
+
+	inline int numberOfJoints()
+	{ return m_joints; }
+
 private:
 	rigidSkinnedMesh m_rMesh;
 	uint32_t m_vbo;
 	uint32_t m_ibo;
 	std::vector<int> m_indices;
 	glm::mat4 m_modelMatrix;
+	int m_frames;
+	int m_joints;
 };
