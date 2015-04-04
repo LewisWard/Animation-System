@@ -53,11 +53,13 @@ void Application::draw()
 	glm::mat4x4 P = m_camera.get()->projectionMatrix();
 	glm::mat4 m_model = m_mesh->getModelMatrix();
 	//m_model[3].x = 0.0f;
-	m_model[3].y -= 8.0f;
+	m_model[3].y -= 15.0f;
 
 	// need to flip around as exports from Maya the other way around
 	glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
+	glm::vec3 yAxis(0.0f, 1.0f, 0.0f);
 	m_model = glm::rotate(m_model, glm::radians(180.0f), zAxis);
+	m_model = glm::rotate(m_model, glm::radians(180.0f), yAxis);
 
 	// compute the Model-View-Project Matrix
 	glm::mat4x4 MV = V * m_model;
@@ -74,7 +76,8 @@ void Application::draw()
 		// shader unifroms
 	m_program->uniform_Matrix4("mvp", 1, false, MVP);
 		// draw the joints
-	for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh->numberOfJoints(); i++)
+		m_mesh->draw(0);
+	for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh->numberOfJoints(); i += m_mesh->numberOfFrames())
 		{
 			m_mesh->draw(i);
 			std::cout << i << std::endl;

@@ -52,4 +52,5 @@ private:
 	float m_currentFrame;
 	gls::Program* m_program;
 	std::shared_ptr<Camera> m_camera;
+	int m_eventCode;
 };
