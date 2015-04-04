@@ -67,9 +67,16 @@ public:
 	inline rigidSkinnedMesh getMesh()
 	{ return m_rMesh; }
 
+	inline glm::mat4 getModelMatrix()
+	{ return m_modelMatrix; }
+
+	inline void setModelMatrix(glm::mat4 matrix)
+	{ m_modelMatrix = matrix; }
+
 private:
 	rigidSkinnedMesh m_rMesh;
 	uint32_t m_vbo;
 	uint32_t m_ibo;
 	std::vector<int> m_indices;
+	glm::mat4 m_modelMatrix;
 };

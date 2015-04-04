@@ -81,6 +81,11 @@ Mesh::Mesh(const char* rig)
 	// Now sort the data to have the correct transforms with the correct frames
 	if (read)
 	{
+		// set the model martix to the Trajectory joint
+		m_modelMatrix[3].x = positions[0].x;
+		m_modelMatrix[3].y = positions[0].y;
+		m_modelMatrix[3].z = positions[0].z;
+
 		// store the correct joint data into the correct joint cluster
 		m_rMesh.clusters.resize(joints);
 		for (size_t j = 0; j < joints; ++j)
