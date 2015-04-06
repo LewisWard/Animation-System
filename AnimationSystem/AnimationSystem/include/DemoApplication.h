@@ -20,6 +20,7 @@
 #include "gl/Program.h"
 #include "Camera.h"
 #include "Mesh.h"
+#include "Xbox.h"
 #include <memory>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,4 +54,5 @@ private:
 	gls::Program* m_program;
 	std::shared_ptr<Camera> m_camera;
 	int m_eventCode;
+	XboxController m_controller;
 };

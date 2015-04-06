@@ -73,16 +73,12 @@ void Application::draw()
 
 	// bind the program
 	m_program->bind();
-		// shader unifroms
+	// shader unifroms
 	m_program->uniform_Matrix4("mvp", 1, false, MVP);
 		// draw the joints
 		m_mesh->draw(0);
-	for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh->numberOfJoints(); i += m_mesh->numberOfFrames())
-		{
+		for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh->numberOfJoints(); i += m_mesh->numberOfFrames())
 			m_mesh->draw(i);
-			std::cout << i << std::endl;
-		}
-
 	// unbind program and texture
 	m_program->unbind();
 
@@ -128,11 +124,13 @@ void Application::update(float dt)
 {
 	// get lastest event 
 	m_eventCode = m_events.update();
+
+	m_controller.update(dt);
+
 	if (m_eventCode)
 		std::cout << m_eventCode << std::endl;
 
 	m_camera->update(dt, m_events);
-	//m_camera.get()->update(dt, m_events);
 
 	// go to the next frame
 	m_currentFrame += dt * NUM_OF_FRAMES;
