@@ -5,9 +5,10 @@ XboxController::XboxController()
 	// set to false
 	m_connected = false;
 
+	// zero the state
 	ZeroMemory(&m_state, sizeof(XINPUT_STATE));
 
-	// Simply get the state of the controller from XInput.
+	// get the state of the controller
 	m_dwReulst = XInputGetState(0, &m_state);
 
 	// check if controller is connected

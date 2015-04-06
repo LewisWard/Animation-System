@@ -64,6 +64,49 @@ void Camera::update(float dt, Event& events)
 
 	// look at:  http://learnopengl.com/#!Getting-started/Camera
 }
+void Camera::update(float dt, Event& events, XboxController& controller)
+{
+	// get lastest event 
+	int eventCode = events.update();
+	glm::vec2 mouse = events.mouseUpdate();
+	glm::vec2 lStick = controller.getLeftStick();
+	glm::vec2 rStick = controller.getRightStick();
+
+	int xDiff = mouse.x - m_lastX;
+	int yDiff = mouse.y - m_lastY;
+	m_lastX = mouse.x;
+	m_lastY = mouse.y;
+
+	// middle mouse button clicked/held
+	if (eventCode == 3)
+		zoomMove(dt, yDiff);
+
+	// if left Crtl is pressed
+	if (eventCode == 5)
+	{
+		verticalMove(dt, yDiff);
+		horizontalMove(dt, xDiff);
+	}
+
+	///// ------------------------- Mouse & Keybaord -------------------------/////
+	// apply zoom
+	m_position.z = m_distance;
+	m_view = glm::translate(glm::mat4(1.0f), m_position);
+
+	// apply rotation
+	m_view = glm::rotate(m_view, glm::radians(m_vAngle), m_dirX); // vertical
+	m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
+
+	///// ------------------------- Xbox Controller -------------------------/////
+	m_position.x += rStick.x;
+	m_position.y += rStick.y;
+	m_position.z = m_distance; // apply zoom
+	m_view = glm::translate(glm::mat4(1.0f), m_position);
+
+	// apply rotation
+	m_view = glm::rotate(m_view, glm::radians(m_vAngle), m_dirX); // vertical
+	m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
+}
 void Camera::verticalMove(float dt, int difference)
 {
 	if (difference > 0.0f)

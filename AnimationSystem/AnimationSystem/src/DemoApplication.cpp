@@ -130,7 +130,7 @@ void Application::update(float dt)
 	if (m_eventCode)
 		std::cout << m_eventCode << std::endl;
 
-	m_camera->update(dt, m_events);
+	m_camera->update(dt, m_events, m_controller);
 
 	// go to the next frame
 	m_currentFrame += dt * NUM_OF_FRAMES;

@@ -20,7 +20,6 @@
 #include "gl/Program.h"
 #include "Camera.h"
 #include "Mesh.h"
-#include "Xbox.h"
 #include <memory>
 
 //----------------------------------------------------------------------------------------------------------------------

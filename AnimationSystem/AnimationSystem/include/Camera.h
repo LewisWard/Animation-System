@@ -2,8 +2,8 @@
 // Program : Animation System Tech Demo
 // Date    : 09/03/2015
 #pragma once
-#include "Window.h"
 #include "Events.h"
+#include "Xbox.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 /// \brief Camera to move around the scene
@@ -16,10 +16,16 @@ public:
 	/// \brief Destructor
 	~Camera();
 
-	/// \brief update the camera
+	/// \brief update the camera (Mouse/Keyboard Support Only)
 	/// \prama float delta time
-	/// \prama float delta time
+	/// \prama Event event handler
 	void update(float dt, Event& events);
+
+	/// \brief update the camera (supports Xbox Controller + Mouse/Keyboard)
+	/// \prama float delta time
+	/// \prama Event event handler
+	/// \prama XboxController Xbox controller
+	void update(float dt, Event& events, XboxController& controller);
 
 	/// \brief get the model matrix
 	/// \prama glm::mat4 model matrix
