@@ -104,6 +104,8 @@ void Camera::update(float dt, Event& events, XboxController& controller)
 	m_view = glm::translate(glm::mat4(1.0f), m_position);
 
 	// apply rotation
+	m_vAngle += lStick.y;
+	m_hAngle += lStick.x;
 	m_view = glm::rotate(m_view, glm::radians(m_vAngle), m_dirX); // vertical
 	m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
 }

@@ -66,8 +66,8 @@ Mesh::Mesh(const char* rig)
 			rotations[frame].z = rotation.z;
 			rotations[frame].w = rotation.w;
 
-			std::cout << frameNumber << " " << positions[frame].x << " " << positions[frame].y << " " << positions[frame].z <<
-		  " " << rotations[frame].x << " " << rotations[frame].y << " " << rotations[frame].z << " " << rotations[frame].w << std::endl;
+			//std::cout << frameNumber << " " << positions[frame].x << " " << positions[frame].y << " " << positions[frame].z <<
+		  //" " << rotations[frame].x << " " << rotations[frame].y << " " << rotations[frame].z << " " << rotations[frame].w << std::endl;
 		}
 
 		// close the file
