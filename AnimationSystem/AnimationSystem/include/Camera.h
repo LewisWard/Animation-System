@@ -27,24 +27,31 @@ public:
 	/// \prama XboxController Xbox controller
 	void update(float dt, Event& events, XboxController& controller);
 
+	/// \brief update the camera (follow target)
+	/// \prama float delta time
+	/// \prama Event event handler
+	/// \prama XboxController Xbox controller
+	/// \prama glm::vec3 trajectory joint
+	void update(float dt, Event& events, XboxController& controller, glm::vec3& trajectoryPosition);
+
 	/// \brief get the model matrix
 	/// \prama glm::mat4 model matrix
-	inline glm::mat4& modelMatrix()
+	inline glm::mat4 modelMatrix()
 	{ return m_model; }
 
 	/// \brief get the view matrix
 	/// \prama glm::mat4 view matrix
-	inline glm::mat4& viewMatrix()
+	inline glm::mat4 viewMatrix()
 	{ return m_view; }
 
 	/// \brief get the projection matrix
 	/// \prama glm::mat4 projection matrix
-	inline glm::mat4& projectionMatrix()
+	inline glm::mat4 projectionMatrix()
 	{ return m_projection; }
 
 	/// \brief get the Model-View-Projection matrix
 	/// \prama glm::mat4 Model-View-Projection matrix
-	inline glm::mat4& MVPMatrix()
+	inline glm::mat4 MVPMatrix()
 	{ return m_projection * m_view; }
 
 private:
