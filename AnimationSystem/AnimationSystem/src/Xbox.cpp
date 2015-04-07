@@ -1,3 +1,6 @@
+// Author  : Lewis Ward
+// Program : Animation System Tech Demo
+// Date    : 06/04/2015
 #include "Xbox.h"
 
 XboxController::XboxController()
@@ -28,6 +31,8 @@ XboxController::~XboxController()
 }
 void XboxController::update(float dt)
 {
+	m_buttonPressed = kNone;
+
 	// make sure there is a controller connected
 	if (m_connected)
 	{
@@ -55,28 +60,34 @@ void XboxController::update(float dt)
 		// A/B/X/Y buttons
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
 		{
+			m_buttonPressed = kA;
 			std::cout << "XINPUT_GAMEPAD_A" << std::endl;
 		}
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
 		{
+			m_buttonPressed = kB;
 			std::cout << "XINPUT_GAMEPAD_B" << std::endl;
 		}
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
 		{
+			m_buttonPressed = kX;
 			std::cout << "XINPUT_GAMEPAD_X" << std::endl;
 		}
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
 		{
+			m_buttonPressed = kY;
 			std::cout << "XINPUT_GAMEPAD_Y" << std::endl;
 		}
 
 		// shoulder buttons
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 		{
+			m_buttonPressed = kLS;
 			std::cout << "XINPUT_GAMEPAD_LEFT_SHOULDER" << std::endl;
 		}
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 		{
+			m_buttonPressed = kRS;
 			std::cout << "XINPUT_GAMEPAD_RIGHT_SHOULDER" << std::endl;
 		}
 
@@ -123,4 +134,8 @@ void XboxController::update(float dt)
 			std::cout << "R Stick: " << m_rightStick.x << " " << m_rightStick.y << std::endl;
 		#endif
 	}
+}
+XboxButtons XboxController::getLastButtonPressed()
+{
+	return m_buttonPressed;
 }

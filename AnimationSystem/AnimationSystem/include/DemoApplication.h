@@ -17,10 +17,19 @@
 */
 
 #pragma once
-#include "gl/Program.h"
-#include "Camera.h"
 #include "Mesh.h"
+#include "Camera.h"
+#include "gl/Program.h"
 #include <memory>
+
+#define ANIMPATH "./animations/"
+#define ANIMCOUNT 2
+
+enum animCycle
+{
+	Idle,
+	Walk,
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 /// \brief  The application, alomst everything is called or run from within this class
@@ -48,7 +57,8 @@ public:
 private:
 	Window m_window; ///< demo window
 	Event m_events;  ///< demo user input events
-	std::shared_ptr<Mesh> m_mesh;
+	Mesh* m_mesh[ANIMCOUNT];
+	animCycle m_currentState;
 	float m_currentFrame;
 	gls::Program* m_program;
 	std::shared_ptr<Camera> m_camera;

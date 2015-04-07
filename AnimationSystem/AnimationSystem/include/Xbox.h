@@ -1,7 +1,17 @@
+// Author  : Lewis Ward
+// Program : Animation System Tech Demo
+// Date    : 06/04/2015
 #pragma once
 #include "Window.h"
 #include <Windows.h>
 #include <Xinput.h>
+
+enum XboxButtons
+{
+	kNone,
+	kA, kB, kX, kY,
+	kLS, kRS,
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 /// \brief Handles a xbox controller
@@ -33,10 +43,13 @@ public:
 	inline glm::vec2 getRightStick()
 	{ return m_rightStick; }
 
+	XboxButtons getLastButtonPressed();
+
 private:
 	DWORD m_dwReulst; ///< used to get result from XINPUT
 	XINPUT_STATE m_state; ///< the state of the controller
 	bool m_connected; ///< controller connected state
 	glm::vec2 m_leftStick; ///< left stick movement value
 	glm::vec2 m_rightStick; ///< right stick movement value
+	XboxButtons m_buttonPressed;
 };
