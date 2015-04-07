@@ -64,4 +64,5 @@ private:
 	std::shared_ptr<Camera> m_camera;
 	int m_eventCode;
 	XboxController m_controller;
+	glm::mat4 m_trajectoryJoint;
 };

@@ -54,7 +54,6 @@ void Application::draw()
 	glm::mat4x4 V = m_camera.get()->viewMatrix();
 	glm::mat4x4 P = m_camera.get()->projectionMatrix();
 	glm::mat4 m_model = m_mesh[m_currentState]->getModelMatrix();
-	//m_model[3].x = 0.0f	m_model[3].y -= 15.0f;
 
 	// need to flip around as exports from Maya the other way around
 	glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
@@ -92,15 +91,35 @@ void Application::update(float dt)
 
 	m_controller.update(dt);
 
-	if (m_controller.getLastButtonPressed() == kA)
+	std::cout << m_controller.getRightStick().x << std::endl;
+	if (fabs(m_controller.getRightStick().x) > 0.75f)
 	{
-			m_currentState = Walk;
+		// change state and update next animation cycle trajectory poisiton
+		m_currentState = Walk;
+		m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 	}
-	else 	if (m_controller.getLastButtonPressed() == kB)
+	else
 	{
+		// change state and update next animation cycle trajectory poisiton
 		m_currentState = Idle;
+		m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 	}
 
+	#ifdef _DEBUG
+		if (m_controller.getLastButtonPressed() == kA)
+		{
+			// change state and update next animation cycle trajectory poisiton
+			m_currentState = Walk;
+			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
+	
+		}
+		else 	if (m_controller.getLastButtonPressed() == kB)
+		{
+			// change state and update next animation cycle trajectory poisiton
+			m_currentState = Idle;
+			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
+		}
+	#endif
 
 	if (m_eventCode)
 		std::cout << m_eventCode << std::endl;
@@ -108,11 +127,11 @@ void Application::update(float dt)
 	m_mesh[m_currentState]->update(dt, m_events, m_controller);
 	
 	// get the Trajectory joint position
-	glm::mat4 mMatrix = m_mesh[m_currentState]->getModelMatrix();
+	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
 	glm::vec3 mVector;
-	mVector.x = mMatrix[3].x;
-	mVector.y = mMatrix[3].y;
-	mVector.z = mMatrix[3].z;
+	mVector.x = m_trajectoryJoint[3].x;
+	mVector.y = m_trajectoryJoint[3].y;
+	mVector.z = m_trajectoryJoint[3].z;
 	
 	m_camera->update(dt, m_events, m_controller, mVector);
 
