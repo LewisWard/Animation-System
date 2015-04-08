@@ -3,6 +3,8 @@
 // Date    : 20/02/2015
 #pragma once
 #include "Texture.h"
+#include "Events.h"
+#include "Xbox.h"
 #include <vector>
 #include <fstream>   
 #define NUM_OF_FRAMES 24.0
@@ -43,6 +45,7 @@ struct rigidSkinnedMesh
 	mesh* originalMesh;
 	std::vector<jointCluster> clusters;
 	std::vector<vertNormal> deformed;
+	std::vector<vertNormalUV> meshData;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -51,18 +54,23 @@ struct rigidSkinnedMesh
 class Mesh
 {
 public:
-
 	/// \brief	ctor
 	/// \param const char* filename of the file that contains the rig (animation data)
 	Mesh(const char* rig);
 	/// \brief  dtor
 	~Mesh();
 
+	void update(float dt, Event& events, XboxController& controller);
+
 	void draw();
 
 	void draw(int frame);
 
 	void fetchDraw(int offset);
+	
+	void drawObject();
+
+	void drawObject(int frame);
 
 	inline rigidSkinnedMesh getMesh()
 	{ return m_rMesh; }
@@ -83,8 +91,13 @@ private:
 	rigidSkinnedMesh m_rMesh;
 	uint32_t m_vbo;
 	uint32_t m_ibo;
+	uint32_t m_vboMesh;
+	uint32_t m_iboMesh;
 	std::vector<int> m_indices;
+	std::vector<int> m_meshDataVertices;
 	glm::mat4 m_modelMatrix;
 	int m_frames;
 	int m_joints;
+	int m_vertices;
+	int m_meshIndices;
 };

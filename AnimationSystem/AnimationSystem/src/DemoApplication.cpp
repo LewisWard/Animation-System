@@ -17,8 +17,8 @@ Application::Application()
 	}
 	else
 	{
-		m_mesh[0] = new Mesh(ANIMPATH"Idle.amesh");
-		m_mesh[1] = new Mesh(ANIMPATH"Walking.amesh");
+		m_mesh[0] = new Mesh(ANIMPATH"All.amesh");
+		m_mesh[1] = new Mesh(ANIMPATH"All.amesh");
 
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
@@ -58,7 +58,7 @@ void Application::draw()
 	// need to flip around as exports from Maya the other way around
 	glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
 	glm::vec3 yAxis(0.0f, 1.0f, 0.0f);
-	m_model = glm::rotate(m_model, glm::radians(180.0f), zAxis);
+	//m_model = glm::rotate(m_model, glm::radians(180.0f), zAxis);
 	m_model = glm::rotate(m_model, glm::radians(180.0f), yAxis);
 
 	// compute the Model-View-Project Matrix
@@ -71,8 +71,12 @@ void Application::draw()
 	m_program->uniform_Matrix4("mvp", 1, false, MVP);
 		// draw the Trajectory joint
 		m_mesh[m_currentState]->draw(0);
+		m_mesh[m_currentState]->drawObject();
 		for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh[m_currentState]->numberOfFrames(); i += m_mesh[m_currentState]->numberOfFrames())
+		{
 			m_mesh[m_currentState]->draw(i);
+			m_mesh[m_currentState]->drawObject(i);
+		}
 	// unbind program and texture
 	m_program->unbind();
 
