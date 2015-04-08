@@ -15,6 +15,11 @@
 #include <maya/MQuaternion.h>
 #include <maya/MMatrix.h>
 #include <maya/MAnimControl.h>
+#include <maya/MFnSet.h>
+#include <maya/MFnWeightGeometryFilter.h>
+#include <maya/MSelectionList.h>
+#include <maya/MItGeometry.h>
+#include <maya/MFloatArray.h>
 #include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,14 +130,75 @@ struct jointAnimation
 };
 
 //----------------------------------------------------------------------------------------------------------------------
+/// \brief Stores a joint cluster
+/// \note  Useful website: http://nccastaff.bournemouth.ac.uk/jmacey/RobTheBloke/www/research/maya/mfnjointcluster.htm
+//----------------------------------------------------------------------------------------------------------------------
+struct jointCluster
+{
+	uint32_t vertexCount = 0;
+	std::vector<vec3> positions;
+	std::vector<vec3> normals;
+
+	void influencedGeometry(MFnWeightGeometryFilter cluster)
+	{
+		// set the function to get the cluster members
+		MFnSet set(cluster.deformerSet());
+		
+		// got to be a prt otherwise it will not compile, no idea why
+		MSelectionList objects;
+		
+		// get the objects within the cluster
+		set.getMembers(objects, true);
+		
+		vertexCount++;
+		
+		for (uint32_t i = 0; i < objects.length(); i++)
+		{
+			MDagPath skin;
+			MObject elements;
+			MFloatArray weights;
+		
+			// get path to the affected element
+			objects.getDagPath(i, skin, elements);
+		
+			// get the vertex indices and weights for each point under influence
+			// the weights should be 1, so can ignore them
+			cluster.getWeights(skin, elements, weights);
+		
+			// set the function to the shape, in order to access it's name
+			MFnDependencyNode Shape(elements);
+		
+			//std::cout << "\tShape "
+			//					<< Shape.name().asChar()
+			//					<< "\n\tNumPoints "
+			//					<< weights.length()
+			//					<< "\n";
+		
+		
+			// output the vertex indices by iterating through the geometry components
+			MItGeometry it(skin, elements);
+			for (; !it.isDone(); it.next())
+			{
+				//std::cout << "\t\t" << it.index() << "\n";
+			}
+		}
+
+	}
+};
+
+//----------------------------------------------------------------------------------------------------------------------
 /// \brief Stores all animation data for a single joint
 //----------------------------------------------------------------------------------------------------------------------
 struct animation
 {
 	animation(uint32_t frames, const MDagPathArray& paths) : framesNum(frames), jointsNum(paths.length())
 	{
+		// copy and store all the objects in teh scene
+		m_bones = paths;
+
 		// resize the vector
 		m_animation.resize(jointsNum);
+		m_cluster.resize(1);
 
 		// cycles the joints
 		for (uint32_t i = 0; i < jointsNum; ++i)
@@ -181,12 +247,14 @@ struct animation
 private:
 	uint32_t framesNum; ///< number of frames
 	uint32_t jointsNum; ///< number of joints
-	std::vector<jointAnimation> m_animation; ///< position and rotation 
+	std::vector<jointAnimation> m_animation; ///< position and rotation of joints
+	std::vector<jointCluster> m_cluster; ///< position and rotation of joint clusters
 	MDagPath trajectory; ///< the charaters trajectory (the floor under the character)
 	MDagPath hips; ///< the charaters hips
 	uint32_t hipsIndex; ///< index for the hips
 	uint32_t trajectoryIndex; ///< index for the trajectory
 	float cycle_diff[1]; ///< the number of different cycles
+	MDagPathArray m_bones; ///< all mesh objects in the scene
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -230,4 +298,5 @@ protected:
 
 private:
 	animation* m_animation;
+	MDagPathArray m_bones; ///< all mesh objects in the scene
 };
