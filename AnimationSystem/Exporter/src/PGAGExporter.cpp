@@ -15,6 +15,9 @@
 #include <maya/MFloatMatrix.h>
 #include <maya/MMatrix.h>
 #include <maya/MItMeshPolygon.h>
+#include <maya/MItDependencyNodes.h>
+#include <maya/MPlug.h>
+#include <maya/MPlugArray.h>
 
 bool animation::write(const char* filename)
 {
@@ -62,13 +65,78 @@ bool animation::write(const char* filename)
 			// write results to file
 			ouputFileStream << f << " "
 				<< m_animation[i].positions[f].x << " "
-				<< -m_animation[i].positions[f].y << " " // need to invert as in the program Y is the otherway round
+				<< m_animation[i].positions[f].y << " " // need to invert as in the program Y is the otherway round
 				<< m_animation[i].positions[f].z << " "
 				<< m_animation[i].rotations[f].x << " "
 				<< m_animation[i].rotations[f].y << " "
 				<< m_animation[i].rotations[f].z << " "
 				<< m_animation[i].rotations[f].w << std::endl;
 		}
+	}
+
+	// joint cluster iterator
+	MItDependencyNodes jointIT(MFn::kJointCluster);
+
+	// go over all joint clusters
+	while (!jointIT.isDone())
+	{
+		// attach function set
+		MFnDependencyNode nodeCluster(jointIT.item());
+
+		// get a plug to the matrix attribute
+		MPlug plug = nodeCluster.findPlug("matrix");
+		MPlugArray connections;
+
+		// if the attribute is connected to a transform
+		if (plug.connectedTo(connections, true, false))
+		{
+			// write to file
+			MFnDependencyNode fnTransform(connections[0].node());
+			ouputFileStream << fnTransform.name().asChar() << std::endl;
+		}
+
+		// create a weight filter
+		MFnWeightGeometryFilter geoWeight(jointIT.item());
+
+		// set the function to get the cluster members
+		MFnSet set(geoWeight.deformerSet());
+
+		// a selection list for objects within Maya
+		MSelectionList objects;
+
+		// get the objects in the cluster
+		set.getMembers(objects, true);
+
+		// cycle over the objects
+		for (uint32_t i = 0; i < objects.length(); i++)
+		{
+			MDagPath skin;
+			MObject elements;
+			MFloatArray weights;
+
+			// get path to the affected element
+			objects.getDagPath(i, skin, elements);
+
+			// get the vertex indices and weights for each point under influence
+			// the weights should be 1, so can ignore them
+			geoWeight.getWeights(skin, elements, weights);
+
+			// set the function to the shape, in order to access it's name
+			MFnDependencyNode shape(elements);
+
+			// write shape name, and its number of points
+			ouputFileStream << shape.name().asChar() << weights.length() << "\n";
+
+			// output the vertex indices by iterating through the geometry components
+			MItGeometry it(skin, elements);
+			for (; !it.isDone(); it.next())
+			{
+				ouputFileStream << it.index() << "\n";
+			}
+		}
+
+		// get next
+		jointIT.next();
 	}
 
 	// cycle all objects
@@ -90,7 +158,7 @@ bool animation::write(const char* filename)
 		fn.getPoints(vertices);
 		fn.getNormals(normals);
 		fn.getUVs(uCoord, vCoord);
-
+ 
 		// will be used to build up a map. As Maya uses several sets of indices it creates a small
 		// problem, as OpenGL uses only one set of indices for vertex data! 
 		struct mappingTriple
@@ -264,9 +332,6 @@ MStatus PGAGExporter::writer(const MFileObject& file, const MString& /*optionsSt
 		// grab a path for the node, this will allow for instancing
 		MDagPath path;
 		it.getPath(path);
-
-		// attach the function set to the object
-		MFnTransform fn(it.item());
 
 		// initialise to get the node
 		MFnDagNode dagNode(path);

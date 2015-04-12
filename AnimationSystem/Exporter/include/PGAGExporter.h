@@ -7,6 +7,8 @@
 #pragma once 
 #include <cstdint>
 #include <maya/MPxFileTranslator.h>
+#include <maya/MItDag.h>
+#include <maya/MFnDagNode.h>
 #include <maya/MDagPath.h>
 #include <maya/MString.h>
 #include <maya/MFileObject.h>

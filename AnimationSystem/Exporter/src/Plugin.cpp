@@ -9,7 +9,7 @@
 MLL_EXPORT MStatus initializePlugin(MObject obj)
 {
 	// initialise the plugin
-	MFnPlugin plugin(obj, "PGAG Animation Mesh Exporter", "1.0", "Any");
+	MFnPlugin plugin(obj, "Lewis Ward", "1.0", "Any");
 
 	// plugin only registers the file translator
 	return plugin.registerFileTranslator("PGAG Mesh Exporter", 0, PGAGExporter::create);
