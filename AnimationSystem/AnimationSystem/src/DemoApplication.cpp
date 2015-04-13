@@ -58,8 +58,6 @@ void Application::draw()
 	// need to flip around as exports from Maya the other way around
 	glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
 	glm::vec3 yAxis(0.0f, 1.0f, 0.0f);
-	//m_model = glm::rotate(m_model, glm::radians(180.0f), zAxis);
-	m_model = glm::rotate(m_model, glm::radians(180.0f), yAxis);
 
 	// compute the Model-View-Project Matrix
 	glm::mat4x4 MV = V * m_model;
