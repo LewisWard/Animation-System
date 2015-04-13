@@ -154,7 +154,7 @@ Mesh::Mesh(const char* rig)
 
 		for (size_t vertex = 0; vertex < vertexCount; ++vertex)
 		{
-			ifs >> meshData.V.x >> meshData.V.y >> meshData.N.z
+			ifs >> meshData.V.x >> meshData.V.y >> meshData.V.z
 					>> meshData.N.x >> meshData.N.y >> meshData.N.z
 					>> meshData.U.x >> meshData.U.y;
 
@@ -409,7 +409,7 @@ void Mesh::drawObject()
 	// enable normal
 	glVertexAttribPointer(1, 3, GL_FLOAT, true, sizeof(vertNormalUV), coordinate + 4);
 	glEnableVertexAttribArray(1);
-
+	
 	// enable UV
 	glVertexAttribPointer(2, 2, GL_FLOAT, true, sizeof(vertNormalUV), coordinate + 8);
 	glEnableVertexAttribArray(2);
