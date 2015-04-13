@@ -131,64 +131,6 @@ struct jointAnimation
 		rotations[frame].w = float(rotation.w);
 	}
 };
-
-//----------------------------------------------------------------------------------------------------------------------
-/// \brief Stores a joint cluster
-/// \note  Useful website: http://nccastaff.bournemouth.ac.uk/jmacey/RobTheBloke/www/research/maya/mfnjointcluster.htm
-//----------------------------------------------------------------------------------------------------------------------
-struct jointCluster
-{
-	uint32_t vertexCount = 0;
-	std::vector<vec3> positions;
-	std::vector<vec3> normals;
-
-	void influencedGeometry(MFnWeightGeometryFilter cluster)
-	{
-		// set the function to get the cluster members
-		MFnSet set(cluster.deformerSet());
-		
-		// got to be a prt otherwise it will not compile, no idea why
-		MSelectionList objects;
-		
-		// get the objects within the cluster
-		set.getMembers(objects, true);
-		
-		vertexCount++;
-		
-		for (uint32_t i = 0; i < objects.length(); i++)
-		{
-			MDagPath skin;
-			MObject elements;
-			MFloatArray weights;
-		
-			// get path to the affected element
-			objects.getDagPath(i, skin, elements);
-		
-			// get the vertex indices and weights for each point under influence
-			// the weights should be 1, so can ignore them
-			cluster.getWeights(skin, elements, weights);
-		
-			// set the function to the shape, in order to access it's name
-			MFnDependencyNode Shape(elements);
-		
-			//std::cout << "\tShape "
-			//					<< Shape.name().asChar()
-			//					<< "\n\tNumPoints "
-			//					<< weights.length()
-			//					<< "\n";
-		
-		
-			// output the vertex indices by iterating through the geometry components
-			MItGeometry it(skin, elements);
-			for (; !it.isDone(); it.next())
-			{
-				//std::cout << "\t\t" << it.index() << "\n";
-			}
-		}
-
-	}
-};
-
 //----------------------------------------------------------------------------------------------------------------------
 /// \brief Stores all animation data for a single joint
 //----------------------------------------------------------------------------------------------------------------------
@@ -201,7 +143,6 @@ struct animation
 
 		// resize the vector
 		m_animation.resize(m_jointsNum);
-		m_cluster.resize(1);
 
 		// cycles the joints
 		for (uint32_t i = 0; i < m_jointsNum; ++i)
@@ -261,7 +202,6 @@ private:
 	uint32_t m_framesNum; ///< number of frames
 	uint32_t m_jointsNum; ///< number of joints
 	std::vector<jointAnimation> m_animation; ///< position and rotation of joints
-	std::vector<jointCluster> m_cluster; ///< position and rotation of joint clusters
 	MDagPath trajectory; ///< the charaters trajectory (the floor under the character)
 	MDagPath hips; ///< the charaters hips
 	uint32_t hipsIndex; ///< index for the hips
