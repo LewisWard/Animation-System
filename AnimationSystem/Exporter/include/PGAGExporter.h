@@ -11,6 +11,7 @@
 #include <maya/MFnDagNode.h>
 #include <maya/MDagPath.h>
 #include <maya/MString.h>
+#include <maya/MStringArray.h>
 #include <maya/MFileObject.h>
 #include <maya/MDagPathArray.h>
 #include <maya/MFnIkJoint.h>
@@ -193,22 +194,22 @@ struct jointCluster
 //----------------------------------------------------------------------------------------------------------------------
 struct animation
 {
-	animation(uint32_t frames, const MDagPathArray& paths) : framesNum(frames), jointsNum(paths.length())
+	animation(uint32_t frames, const MDagPathArray& paths) : m_framesNum(frames), m_jointsNum(paths.length())
 	{
 		// copy and store all the objects in teh scene
 		m_bones = paths;
 
 		// resize the vector
-		m_animation.resize(jointsNum);
+		m_animation.resize(m_jointsNum);
 		m_cluster.resize(1);
 
 		// cycles the joints
-		for (uint32_t i = 0; i < jointsNum; ++i)
+		for (uint32_t i = 0; i < m_jointsNum; ++i)
 		{
 			// initialise the joint and resize its position/rotation vectors
 			m_animation[i].init(paths[i]);
-			m_animation[i].positions.resize(framesNum);
-			m_animation[i].rotations.resize(framesNum);
+			m_animation[i].positions.resize(m_framesNum);
+			m_animation[i].rotations.resize(m_framesNum);
 
 			// identify the trajectory and hip joints
 			if (paths[i].partialPathName() == "Hips")
@@ -229,7 +230,7 @@ struct animation
 	void extractFrame(int frame)
 	{
 		// cycle the joints
-		for (uint32_t i = 0; i < jointsNum; ++i)
+		for (uint32_t i = 0; i < m_jointsNum; ++i)
 		{
 			m_animation[i].extractFrame(frame);
 		}
@@ -243,12 +244,22 @@ struct animation
 		m_animation[0].rotations[frame] = m_animation[trajectoryIndex].rotations[frame];
 	}
 	
+	// take all the objects/data from the scene before writing it to file
+	void preWrite();
+
 	// write the ASCII animation data to file
 	bool write(const char* filename);
 
+	struct vertexData
+	{
+		vec3 vertex;
+		vec3 normal;
+		float UV[2];
+	};
+
 private:
-	uint32_t framesNum; ///< number of frames
-	uint32_t jointsNum; ///< number of joints
+	uint32_t m_framesNum; ///< number of frames
+	uint32_t m_jointsNum; ///< number of joints
 	std::vector<jointAnimation> m_animation; ///< position and rotation of joints
 	std::vector<jointCluster> m_cluster; ///< position and rotation of joint clusters
 	MDagPath trajectory; ///< the charaters trajectory (the floor under the character)
@@ -257,6 +268,11 @@ private:
 	uint32_t trajectoryIndex; ///< index for the trajectory
 	float cycle_diff[1]; ///< the number of different cycles
 	MDagPathArray m_bones; ///< all mesh objects in the scene
+	MStringArray m_transformNames; ///< stores names of joint clusters
+	MFloatArray m_transformWeights; ///< stores weights of joint clusters
+	MIntArray m_transformIndex; ///< stores indices of joint clusters
+	std::vector<vertexData> m_vertexArray; ///< stores mesh data
+	std::vector<uint32_t> m_vertexIndices; ///< stores indices for mesh data
 };
 
 //----------------------------------------------------------------------------------------------------------------------

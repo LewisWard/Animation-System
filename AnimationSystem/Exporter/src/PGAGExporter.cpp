@@ -19,61 +19,8 @@
 #include <maya/MPlug.h>
 #include <maya/MPlugArray.h>
 
-bool animation::write(const char* filename)
+void animation::preWrite()
 {
-	// store filename and add extension 
-	std::string file = filename;
-
-	// create the file and open it
-	std::ofstream ouputFileStream(file);
-
-	// write to file
-	ouputFileStream << framesNum << std::endl;
-	ouputFileStream << jointsNum << std::endl;
-
-	for (uint32_t f = 0; f < framesNum; f++)
-	{
-		// get the frame
-		extractFrame(f);
-
-		// write to file
-		for (uint32_t i = 0; i < m_animation.size(); i++)
-		{
-			// get the name of the parent path (i.e Hips etc.)
-			MString parentPathName(m_animation[i].parentPath.partialPathName());
-
-			uint32_t parentIndex = hipsIndex;
-
-			// make sure there is a parent
-			if (parentPathName.numChars())
-			{
-				for (uint32_t l = 0; l < m_animation.size(); l++)
-				{
-					if (parentPathName == m_animation[l].path.partialPathName())
-					{
-						parentIndex = l;
-						break;
-					}
-				}
-				// as it has a parent, add joint position to its parent (this could be done within the program, 
-				// but is easier to perform here). MAKE SURE FREEZE TRANSFORMS HAS BEEN DONE FOR EXPORT!
-				m_animation[i].positions[f].x += m_animation[parentIndex].positions[f].x;
-				m_animation[i].positions[f].y += m_animation[parentIndex].positions[f].y;
-				m_animation[i].positions[f].z += m_animation[parentIndex].positions[f].z;
-			}
-
-			// write results to file
-			ouputFileStream << f << " "
-				<< m_animation[i].positions[f].x << " "
-				<< m_animation[i].positions[f].y << " " // need to invert as in the program Y is the otherway round
-				<< m_animation[i].positions[f].z << " "
-				<< m_animation[i].rotations[f].x << " "
-				<< m_animation[i].rotations[f].y << " "
-				<< m_animation[i].rotations[f].z << " "
-				<< m_animation[i].rotations[f].w << std::endl;
-		}
-	}
-
 	// joint cluster iterator
 	MItDependencyNodes jointIT(MFn::kJointCluster);
 
@@ -90,9 +37,9 @@ bool animation::write(const char* filename)
 		// if the attribute is connected to a transform
 		if (plug.connectedTo(connections, true, false))
 		{
-			// write to file
+			// store transform
 			MFnDependencyNode fnTransform(connections[0].node());
-			ouputFileStream << fnTransform.name().asChar() << std::endl;
+			m_transformNames.append(fnTransform.name());
 		}
 
 		// create a weight filter
@@ -124,20 +71,21 @@ bool animation::write(const char* filename)
 			// set the function to the shape, in order to access it's name
 			MFnDependencyNode shape(elements);
 
-			// write shape name, and its number of points
-			ouputFileStream << shape.name().asChar() << weights.length() << "\n";
+			// store shape name, and its number of points
+			m_transformWeights.append(weights.length());
 
-			// output the vertex indices by iterating through the geometry components
+			// store the vertex indices by iterating through the geometry components
 			MItGeometry it(skin, elements);
 			for (; !it.isDone(); it.next())
 			{
-				ouputFileStream << it.index() << "\n";
+				m_transformIndex.append(it.index());
 			}
 		}
 
 		// get next
 		jointIT.next();
 	}
+
 
 	// cycle all objects
 	for (uint32_t mesh = 0; mesh < m_bones.length(); ++mesh)
@@ -158,7 +106,7 @@ bool animation::write(const char* filename)
 		fn.getPoints(vertices);
 		fn.getNormals(normals);
 		fn.getUVs(uCoord, vCoord);
- 
+
 		// will be used to build up a map. As Maya uses several sets of indices it creates a small
 		// problem, as OpenGL uses only one set of indices for vertex data! 
 		struct mappingTriple
@@ -168,25 +116,15 @@ bool animation::write(const char* filename)
 			int32_t index;
 		};
 
-		// store vertex data
-		struct vertexData
-		{
-			vec3 vertex;
-			vec3 normal;
-			float UV[2];
-		};
-
 		// an array of mapping that is the same size as the number of vertices in the mesh
 		std::vector<std::vector<mappingTriple>> indexedMap;
 		indexedMap.resize(vertices.length());
 
 		// array of vertices
-		std::vector<vertexData> verticesArray;
-		verticesArray.reserve(vertices.length());
+		m_vertexArray.reserve(vertices.length());
 
 		// vertex indices
-		std::vector<uint32_t> vIndices;
-		vIndices.resize(vertices.length() * 2);
+		m_vertexIndices.resize(vertices.length() * 2);
 		uint32_t index = 0; ///< first index
 
 		// need to split every polygon face into triangles and create a set of UV's for them
@@ -247,12 +185,12 @@ bool animation::write(const char* filename)
 					vData.UV[0] = uv[0];
 					vData.UV[1] = uv[1];
 
-					verticesArray.push_back(vData);
+					m_vertexArray.push_back(vData);
 
 					mappingTriple id;
 					id.n = normalI;
 					id.t = uvI;
-					id.index = (int32_t)(verticesArray.size() - 1);
+					id.index = (int32_t)(m_vertexArray.size() - 1);
 					indexedMap[vertexI].push_back(id);
 
 					indicesFaceA.push_back(id.index);
@@ -280,7 +218,7 @@ bool animation::write(const char* filename)
 					{
 						if (vertexTri == indicesFaceB[z])
 						{
-							vIndices.push_back(indicesFaceA[z]);
+							m_vertexIndices.push_back(indicesFaceA[z]);
 						}
 					}
 				}
@@ -290,28 +228,114 @@ bool animation::write(const char* filename)
 			indicesFaceB.clear();
 			polyIT.next();
 		}
+	}
 
-		// make sure zero is not printed
-		if (verticesArray.size() || vIndices.size())
+}
+bool animation::write(const char* filename)
+{
+	// store filename and add extension 
+	std::string file = filename;
+
+	// create the file and open it
+	std::ofstream ouputFileStream(file);
+
+	// write to file
+	ouputFileStream << m_framesNum << std::endl;
+	ouputFileStream << m_jointsNum << std::endl;
+
+	// make sure zero is not printed
+	if (m_vertexArray.size() || m_vertexIndices.size())
+	{
+		ouputFileStream << m_vertexArray.size() << std::endl;
+		ouputFileStream << m_vertexIndices.size() << std::endl;
+	}
+
+	// output the index and name of the mesh/joint in the scene
+	for (uint32_t i = 0; i < m_animation.size(); i++)
+	{
+		ouputFileStream << i << " " << m_animation[i].path.partialPathName() << "\n";
+	}
+
+	for (uint32_t f = 0; f < m_framesNum; f++)
+	{
+		// get the frame
+		extractFrame(f);
+
+		// write to file
+		for (uint32_t i = 0; i < m_animation.size(); i++)
 		{
-				ouputFileStream << verticesArray.size() << std::endl;
-				ouputFileStream << vIndices.size() << std::endl;
+			// get the name of the parent path (i.e Hips etc.)
+			MString parentPathName(m_animation[i].parentPath.partialPathName());
+
+			uint32_t parentIndex = hipsIndex;
+
+			// make sure there is a parent
+			if (parentPathName.numChars())
+			{
+				for (uint32_t l = 0; l < m_animation.size(); l++)
+				{
+					if (parentPathName == m_animation[l].path.partialPathName())
+					{
+						parentIndex = l;
+						break;
+					}
+				}
+				// as it has a parent, add joint position to its parent (this could be done within the program, 
+				// but is easier to perform here). MAKE SURE FREEZE TRANSFORMS HAS BEEN DONE FOR EXPORT!
+				m_animation[i].positions[f].x += m_animation[parentIndex].positions[f].x;
+				m_animation[i].positions[f].y += m_animation[parentIndex].positions[f].y;
+				m_animation[i].positions[f].z += m_animation[parentIndex].positions[f].z;
+			}
+
+			// write results to file
+			ouputFileStream << f << " "
+				<< m_animation[i].positions[f].x << " "
+				<< m_animation[i].positions[f].y << " " // need to invert as in the program Y is the otherway round
+				<< m_animation[i].positions[f].z << " "
+				<< m_animation[i].rotations[f].x << " "
+				<< m_animation[i].rotations[f].y << " "
+				<< m_animation[i].rotations[f].z << " "
+				<< m_animation[i].rotations[f].w << std::endl;
 		}
-		for (size_t kk = 0; kk < verticesArray.size(); ++kk)
+	}
+
+	// print the joint name, and the number of connections it have and those indices
+	for (int i = 0; i < m_transformNames.length(); ++i)
+	{
+		ouputFileStream << m_transformNames[i] << " " << m_transformWeights[i] << std::endl;
+		int connectionCount = m_transformWeights[i];
+
+		for (int j = 0; j < connectionCount; ++j)
 		{
-			ouputFileStream << verticesArray[kk].vertex.x << " "
-				<< verticesArray[kk].vertex.y << " "
-				<< verticesArray[kk].vertex.z << " "
-				<< verticesArray[kk].normal.x << " "
-				<< verticesArray[kk].normal.y << " "
-				<< verticesArray[kk].normal.z << " "
-				<< verticesArray[kk].UV[0] << " "
-				<< verticesArray[kk].UV[1] << std::endl;
+			ouputFileStream << m_transformIndex[j] << std::endl;
 		}
-		for (size_t kk = 0; kk < vIndices.size(); kk += 3)
+	}
+
+	// write vertex and index data
+	for (size_t kk = 0; kk < m_vertexArray.size(); ++kk)
+	{
+		ouputFileStream << m_vertexArray[kk].vertex.x << " "
+			<< m_vertexArray[kk].vertex.y << " "
+			<< m_vertexArray[kk].vertex.z << " "
+			<< m_vertexArray[kk].normal.x << " "
+			<< m_vertexArray[kk].normal.y << " "
+			<< m_vertexArray[kk].normal.z << " "
+			<< m_vertexArray[kk].UV[0] << " "
+			<< m_vertexArray[kk].UV[1] << std::endl;
+	}
+	for (size_t kk = 0; kk < m_vertexIndices.size(); kk += 3)
+	{
+		// stop it printing out 0, 0, 0 several times that it shouldn't
+		bool tripleZero = false;
+
+		if (m_vertexIndices[kk] == 0 && m_vertexIndices[kk + 1] == 0 && m_vertexIndices[kk + 2] == 0)
 		{
-			ouputFileStream << vIndices[kk] << " " << vIndices[kk + 1] << " " << vIndices[kk + 2] << std::endl;
+			tripleZero = true;
 		}
+
+		
+		if (!tripleZero)
+			ouputFileStream << m_vertexIndices[kk] << " " << m_vertexIndices[kk + 1] << " " << m_vertexIndices[kk + 2] << std::endl;
 	}
 	
 	// close
@@ -396,6 +420,9 @@ MStatus PGAGExporter::writer(const MFileObject& file, const MString& /*optionsSt
 
 	// create new animation
 	m_animation = new animation(totalFrames, bones);
+
+	// gather everything I want from the scene
+	m_animation->preWrite();
 
 	// export data
 	MStatus status = m_animation->write(file.fullName().asChar()) ? MS::kSuccess : MS::kFailure;
