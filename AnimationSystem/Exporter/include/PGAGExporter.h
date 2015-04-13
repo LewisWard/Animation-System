@@ -273,6 +273,7 @@ private:
 	MIntArray m_transformIndex; ///< stores indices of joint clusters
 	std::vector<vertexData> m_vertexArray; ///< stores mesh data
 	std::vector<uint32_t> m_vertexIndices; ///< stores indices for mesh data
+	uint32_t m_jointClusters; ///< the number of joint clusters
 };
 
 //----------------------------------------------------------------------------------------------------------------------

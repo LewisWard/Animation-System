@@ -21,6 +21,8 @@
 
 void animation::preWrite()
 {
+	m_jointClusters = 0;
+
 	// joint cluster iterator
 	MItDependencyNodes jointIT(MFn::kJointCluster);
 
@@ -81,6 +83,9 @@ void animation::preWrite()
 				m_transformIndex.append(it.index());
 			}
 		}
+
+		// increase count
+		m_jointClusters++;
 
 		// get next
 		jointIT.next();
@@ -249,6 +254,9 @@ bool animation::write(const char* filename)
 		ouputFileStream << m_vertexArray.size() << std::endl;
 		ouputFileStream << m_vertexIndices.size() << std::endl;
 	}
+
+	// the total number of joint clusters
+	ouputFileStream << m_jointClusters << std::endl;
 
 	// output the index and name of the mesh/joint in the scene
 	for (uint32_t i = 0; i < m_animation.size(); i++)

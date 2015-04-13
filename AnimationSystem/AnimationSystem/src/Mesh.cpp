@@ -3,31 +3,44 @@
 // Date    : 20/02/2015
 #include "Mesh.h"
 
-// animation file format:
-// the file contains joint/frame data and mesh data, the joint/frame data is within the first half of
-// the file and mesh data in the second half.
-// framesNum											///< uint32_t
-// jointsNum											///< uint32_t
-// positions[f].x									///< vec3
-// positions[f].y									///< vec3
-// positions[f].z									///< vec3
-// rotations[f].x									///< quat (vec4)
-// rotations[f].y									///< quat (vec4)
-// rotations[f].z									///< quat (vec4)
-// rotations[f].w									///< quat (vec4)
-// number of vertices (mesh data) ///< uint32_t
-// number of indices (mesh data)  ///< uint32_t
-// vertexPositions[f].x						///< vec3
-// vertexPositions[f].y 					///< vec3
-// vertexPositions[f].z 					///< vec3
-// vertexNormal[f].x							///< vec3
-// vertexNormal[f].y 							///< vec3
-// vertexNormal[f].z 							///< vec3
-// vertexUV[f].x 									///< vec2
-// vertexUV[f].y 									///< vec2
-// the first joint should always be the Trajectory followed by the Hips (provided named in Maya)
-// without the Trajectory or Hips joint the plugin will crash Maya!
+/* Animated Mesh (.amesh) file format:
+// ------------------------------------------ About the format ------------------------------------------ //
+   The file contains joint/frame data and mesh data, the joint/frame data is within the first half of
+   the file and mesh data in the second half. The first joint should always be the Trajectory followed by 
+	 the Hips (provided named in Maya) without the Trajectory or Hips joint the plugin will crash Maya!
+	 Any other joint after the first 2 joints can be called anything you like.
 
+// ------------------------------------------  File structure  ------------------------------------------ //
+   framesNum											///< uint32_t
+   jointsNum											///< uint32_t
+	 verticesNum										///< uint32_t
+	 indicesNum											///< uint32_t
+	 jointClusterNum								///< uint32_t
+	 joint index										///< uint32_t
+	 joint name											///< string
+	 frame													///< int
+   positions[f].x									///< vec3
+   positions[f].y									///< vec3
+   positions[f].z									///< vec3
+   rotations[f].x									///< quat (vec4)
+   rotations[f].y									///< quat (vec4)
+   rotations[f].z									///< quat (vec4)
+   rotations[f].w									///< quat (vec4)
+   jointCluster	name							///< string
+   jointCluster connections				///< uint32_t
+   indices of the connections			///< uint32_t
+	 vertexPositions[f].x						///< vec3
+   vertexPositions[f].y 					///< vec3
+   vertexPositions[f].z 					///< vec3
+   vertexNormal[f].x							///< vec3
+   vertexNormal[f].y 							///< vec3
+   vertexNormal[f].z 							///< vec3
+   vertexUV[f].x 									///< vec2
+   vertexUV[f].y 									///< vec2
+   indicesA												///< uint32_t
+	 indicesB												///< uint32_t
+	 indicesC												///< uint32_t
+*/
 
 Mesh::Mesh(const char* rig)
 {
@@ -36,7 +49,8 @@ Mesh::Mesh(const char* rig)
 	// open file
 	std::ifstream ifs(rig);
 
-	uint32_t frames = 0, joints = 0, frameNumber = 0, vertexCount = 0, indexCount = 0;
+	char jointClusterName[100];
+	uint32_t frames = 0, joints = 0, frameNumber = 0, vertexCount = 0, indexCount = 0, jointClusterCount = 0;
 	std::vector<glm::vec3> positions;
 	std::vector<glm::vec4> rotations;
 
@@ -56,12 +70,26 @@ Mesh::Mesh(const char* rig)
 		// read in the data
 		ifs >> frames;
 		ifs >> joints;
-
+		ifs >> vertexCount;
+		ifs >> indexCount;
+		ifs >> m_jointClusterCount;
+				
+		// read in the joint mapping
+		m_jointMapping.resize(joints);
+		for (size_t map = 0; map < joints; ++map)
+		{
+			ifs >> m_jointMapping[map].index;
+			ifs.get(jointClusterName, 100);
+			m_jointMapping[map].name = jointClusterName;
+		}
+		
 		// resize vectors
 		positions.resize(joints * frames);
 		rotations.resize(joints * frames);
 		m_rMesh.clusters.resize(joints);
 		m_indices.resize(positions.size());
+		vertices.resize(vertexCount);
+		indices.resize(indexCount);
 
 		for (size_t i = 0; i < m_indices.size(); ++i)
 			m_indices[i] = i;
@@ -83,17 +111,46 @@ Mesh::Mesh(const char* rig)
 			rotations[frame].y = rotation.y;
 			rotations[frame].z = rotation.z;
 			rotations[frame].w = rotation.w;
-
-			//std::cout << frameNumber << " " << positions[frame].x << " " << positions[frame].y << " " << positions[frame].z <<
-			//" " << rotations[frame].x << " " << rotations[frame].y << " " << rotations[frame].z << " " << rotations[frame].w << std::endl;
-
 		}
 
-		ifs >> vertexCount;
-		ifs >> indexCount;
+		// read in all joint clusters
+		for (int i = 0; i < m_jointClusterCount; ++i)
+		{
+			// read in the joint cluster data
+			ifs >> jointClusterName;
+			ifs >> jointClusterCount;
 
-		vertices.resize(vertexCount);
-		indices.resize(indexCount);
+			// create and fill joint cluster
+			jointCluster tempCluster;
+			std::string jointName(jointClusterName);
+
+			// check that the names match, if so we know the index
+			int jointIndex = 0;
+			for (size_t map = 0; map < m_jointMapping.size(); ++map)
+			{
+				// get the char array and remove white space from the start
+				std::string jointNameOrg(m_jointMapping[map].name);
+				jointNameOrg.erase(0, 1);
+
+				// do the check
+				if (jointName == jointNameOrg)
+				{
+					jointIndex = m_jointMapping[map].index;
+					break;
+				}
+			}
+			// assign the index and resize the vertives
+			tempCluster.joint = jointIndex;
+			tempCluster.verts.resize(jointClusterCount);
+
+			for (int i = 0; i < jointClusterCount; ++i)
+			{
+				ifs >> tempCluster.verts[i];
+			}
+
+			// add joint cluster
+			m_jointCluster.push_back(tempCluster);
+		}
 
 		for (size_t vertex = 0; vertex < vertexCount; ++vertex)
 		{

@@ -40,6 +40,12 @@ struct jointCluster
 	std::vector<int> verts; ///< indices of the vertices within this joint cluster
 };
 
+struct jointMap
+{
+	int index;
+	std::string name;
+};
+
 struct rigidSkinnedMesh
 {
 	mesh* originalMesh;
@@ -95,9 +101,12 @@ private:
 	uint32_t m_iboMesh;
 	std::vector<int> m_indices;
 	std::vector<int> m_meshDataVertices;
+	std::vector<jointCluster> m_jointCluster;
+	std::vector<jointMap> m_jointMapping;
 	glm::mat4 m_modelMatrix;
 	int m_frames;
 	int m_joints;
 	int m_vertices;
 	int m_meshIndices;
+	int m_jointClusterCount;
 };
