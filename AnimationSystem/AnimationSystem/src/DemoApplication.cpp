@@ -17,8 +17,8 @@ Application::Application()
 	}
 	else
 	{
-		m_mesh[0] = new Mesh(ANIMPATH"All.amesh");
-		m_mesh[1] = new Mesh(ANIMPATH"All.amesh");
+		m_mesh[0] = new Mesh(ANIMPATH"Idle.amesh");
+		m_mesh[1] = new Mesh(ANIMPATH"Walk.amesh");
 
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
