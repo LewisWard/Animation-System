@@ -12,6 +12,7 @@ enum events
 	kNONE, ///< nothing pressed
 	kSpace, ///< Space bar 
 	kMDL, kMDM, kMDR, ///< Mouse Down Left/Middle/Right
+	kCtrl, kAlt ///< left control / left Alt
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -33,6 +34,10 @@ public:
 	///\prama bool false to quit program
 	inline bool playState()
 	{ return m_playState; }
+
+	///\brief force quit the program
+	inline void forceQuit()
+	{ m_playState = false; }
 
 	///\brief update mouse position
 	///\return math::vec2 new mouse position

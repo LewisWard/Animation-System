@@ -7,7 +7,7 @@
 bool initSDL()
 {
 	// initialisation of SDL
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 	{
 		// initialisation failed
 		std::cout << "Failed to initialise SDL" << std::endl;
@@ -105,7 +105,7 @@ Window::Window()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	// multiply matrix with orthographic matrix
-	glOrtho(0, m_winW, m_winH, 0, 0, 50);
+	glOrtho(0, m_winW, m_winH, 0, 0, -250);
 	// modelview matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

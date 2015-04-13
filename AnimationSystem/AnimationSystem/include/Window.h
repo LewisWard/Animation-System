@@ -8,8 +8,12 @@
 #include "gl/SDL_opengl.h"
 #include "gl/SDL_image.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform.hpp"
 #include <iostream>
 #include <Windows.h>
+#include <cstdint>
 
 // This header file has been taken but modified from my PGAG Assignment 1 project
 
