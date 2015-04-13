@@ -55,10 +55,6 @@ void Application::draw()
 	glm::mat4x4 P = m_camera.get()->projectionMatrix();
 	glm::mat4 m_model = m_mesh[m_currentState]->getModelMatrix();
 
-	// need to flip around as exports from Maya the other way around
-	glm::vec3 zAxis(0.0f, 0.0f, 1.0f);
-	glm::vec3 yAxis(0.0f, 1.0f, 0.0f);
-
 	// compute the Model-View-Project Matrix
 	glm::mat4x4 MV = V * m_model;
 	MVP = P * MV;
@@ -107,7 +103,19 @@ void Application::update(float dt)
 		m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 	}
 
+	// Debug builds only
 	#ifdef _DEBUG
+		// turn on fill
+		if (m_controller.getLastButtonPressed() == kX)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		// turn on wirefire
+		if (m_controller.getLastButtonPressed() == kY)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+
 		if (m_controller.getLastButtonPressed() == kA)
 		{
 			// change state and update next animation cycle trajectory poisiton
@@ -121,10 +129,10 @@ void Application::update(float dt)
 			m_currentState = Idle;
 			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 		}
-	#endif
 
-	if (m_eventCode)
-		std::cout << m_eventCode << std::endl;
+		if (m_eventCode)
+			std::cout << m_eventCode << std::endl;
+	#endif
 
 	m_mesh[m_currentState]->update(dt, m_events, m_controller);
 	

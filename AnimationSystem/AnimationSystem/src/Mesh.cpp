@@ -286,6 +286,9 @@ Mesh::~Mesh()
 {
 	m_rMesh.originalMesh = nullptr;
 	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &m_ibo);
+	glDeleteBuffers(1, &m_vboMesh);
+	glDeleteBuffers(1, &m_iboMesh);
 }
 void Mesh::update(float dt, Event& events, XboxController& controller)
 {
