@@ -245,10 +245,15 @@ Mesh::Mesh(const char* rig)
 		}
 	}
 
+	m_rMesh.originalMesh = new mesh();
+	m_rMesh.originalMesh->verts.resize(m_rMesh.deformed.size());
+
+
 	m_rMesh.meshData.resize(m_vertices);
 	for (size_t i = 0; i < m_vertices; ++i)
 	{
 		m_rMesh.meshData[i] = vertices[i];
+		m_rMesh.originalMesh->verts[i] = vertices[i];
 	}
 
 	m_meshDataVertices.resize(m_meshIndices);
@@ -274,7 +279,7 @@ Mesh::Mesh(const char* rig)
 	glGenBuffers(1, &m_iboMesh);
 	// bind
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboMesh);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormalUV)*m_rMesh.meshData.size(), &m_rMesh.meshData[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormalUV)*m_rMesh.meshData.size(), &m_rMesh.meshData[0], GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboMesh);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_meshDataVertices.size(), &m_meshDataVertices[0], GL_STATIC_DRAW);
 	// unbind
@@ -284,13 +289,14 @@ Mesh::Mesh(const char* rig)
 }
 Mesh::~Mesh()
 {
+	delete m_rMesh.originalMesh;
 	m_rMesh.originalMesh = nullptr;
 	glDeleteBuffers(1, &m_vbo);
 	glDeleteBuffers(1, &m_ibo);
 	glDeleteBuffers(1, &m_vboMesh);
 	glDeleteBuffers(1, &m_iboMesh);
 }
-void Mesh::update(float dt, Event& events, XboxController& controller)
+void Mesh::update(float dt, float frame, Event& events, XboxController& controller)
 {
 	// get lastest event 
 	int eventCode = events.update();
@@ -303,7 +309,7 @@ void Mesh::update(float dt, Event& events, XboxController& controller)
 	position.y = m_modelMatrix[3].y;
 	position.z = m_modelMatrix[3].z;
 
-	std::cout << position.x << " " << position.y << " " << position.z << std::endl;
+	//std::cout << position.x << " " << position.y << " " << position.z << std::endl;
 
 	position.x += rStick.x * 5.0f * dt;
 	position.y += rStick.y * 5.0f * dt;
@@ -315,6 +321,41 @@ void Mesh::update(float dt, Event& events, XboxController& controller)
 	//m_hAngle += lStick.x;
 	//m_view = glm::rotate(m_view, glm::radians(m_vAngle), m_dirX); // vertical
 	//m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
+
+	for (int i = 0; i < 1; ++i)
+	{
+		// access triple indices (stored in a row: a = 3 * rowNum, b = 3 * rowNum + 1, c = 3 * rowNum + 2)
+		int tripleA = m_meshDataVertices[3 * m_jointCluster[1].verts[i]];
+		int tripleB = m_meshDataVertices[3 * m_jointCluster[1].verts[i] + 1];
+		int tripleC = m_meshDataVertices[3 * m_jointCluster[1].verts[i] + 2];
+
+		//for (int i = 1; i <= 3; ++i)
+		{
+			glm::vec3 animFrame(m_rMesh.deformed[24].V);
+			glm::vec3 animFrame1(m_rMesh.deformed[24 + 23].V);
+			glm::vec3 frameDiff(animFrame1 - animFrame);
+			std::cout << frameDiff.x << " " << frameDiff.y << " " << frameDiff.z << std::endl;
+
+			glm::vec3 joint(m_rMesh.originalMesh->verts[m_jointCluster[1].verts[tripleC]].V);
+			glm::vec3 jointB(frameDiff + joint);
+
+			glm::vec3 lerped(glm::lerp(joint, jointB, frame / 24.0f));
+			//std::cout << frame / 24.0f << "| " << lerped.x << " " << lerped.y << " " << lerped.z << std::endl;
+
+			glm::vec3 original(m_rMesh.originalMesh->verts[m_jointCluster[1].verts[tripleC]].V);
+			glm::vec3 offset(joint - original);
+			//std::cout << "joint : " << joint.x << " " << joint.y << " " << joint.z << std::endl;
+			//std::cout << "origin: " << original.x << " " << original.y << " " << original.z << std::endl;
+			//std::cout << "offset: " << offset.x << " " << offset.y << " " << offset.z << std::endl;
+
+			m_rMesh.meshData[m_jointCluster[1].verts[tripleC]].V = lerped;
+		}
+	}
+
+	// update the mesh data within the VBO 
+	glBindBuffer(GL_ARRAY_BUFFER, m_vboMesh);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertNormalUV)*m_rMesh.meshData.size(), &m_rMesh.meshData[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 void Mesh::draw()
 {

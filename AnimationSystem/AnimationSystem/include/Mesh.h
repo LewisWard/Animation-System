@@ -29,7 +29,7 @@ struct vertNormalUV
 
 struct mesh
 {
-	std::vector<vertNormal> verts;
+	std::vector<vertNormalUV> verts;
 	std::vector<int> indices;
 };
 
@@ -66,7 +66,7 @@ public:
 	/// \brief  dtor
 	~Mesh();
 
-	void update(float dt, Event& events, XboxController& controller);
+	void update(float dt, float frame, Event& events, XboxController& controller);
 
 	void draw();
 
