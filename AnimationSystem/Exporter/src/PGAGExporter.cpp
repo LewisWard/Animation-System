@@ -62,6 +62,7 @@ void animation::preWrite()
 			MDagPath skin;
 			MObject elements;
 			MFloatArray weights;
+			MIntArray transformIndex;
 
 			// get path to the affected element
 			objects.getDagPath(i, skin, elements);
@@ -80,8 +81,11 @@ void animation::preWrite()
 			MItGeometry it(skin, elements);
 			for (; !it.isDone(); it.next())
 			{
-				m_transformIndex.append(it.index());
+				transformIndex.append(it.index());
 			}
+
+			// add to array
+			m_transformIndex.push_back(transformIndex);
 		}
 
 		// increase count
@@ -313,9 +317,9 @@ bool animation::write(const char* filename)
 		ouputFileStream << m_transformNames[i] << " " << m_transformWeights[i] << std::endl;
 		int connectionCount = m_transformWeights[i];
 
-		for (int j = 0; j < connectionCount; ++j)
+		for (int j = 0; j < m_transformIndex[i].length(); ++j)
 		{
-			ouputFileStream << m_transformIndex[j] << std::endl;
+			ouputFileStream << m_transformIndex[i][j] << std::endl;
 		}
 	}
 

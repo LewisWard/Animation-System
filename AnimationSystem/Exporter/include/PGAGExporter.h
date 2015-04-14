@@ -23,6 +23,8 @@
 #include <maya/MSelectionList.h>
 #include <maya/MItGeometry.h>
 #include <maya/MFloatArray.h>
+#include <maya/MPoint.h>
+#include <maya/MPointArray.h>
 #include <vector>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -210,7 +212,7 @@ private:
 	MDagPathArray m_bones; ///< all mesh objects in the scene
 	MStringArray m_transformNames; ///< stores names of joint clusters
 	MFloatArray m_transformWeights; ///< stores weights of joint clusters
-	MIntArray m_transformIndex; ///< stores indices of joint clusters
+	std::vector<MIntArray> m_transformIndex; ///< stores indices of joint clusters
 	std::vector<vertexData> m_vertexArray; ///< stores mesh data
 	std::vector<uint32_t> m_vertexIndices; ///< stores indices for mesh data
 	uint32_t m_jointClusters; ///< the number of joint clusters
