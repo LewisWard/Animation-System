@@ -11,6 +11,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/transform.hpp"
+#include "glm/gtx/compatibility.hpp"
 #include <iostream>
 #include <Windows.h>
 #include <cstdint>

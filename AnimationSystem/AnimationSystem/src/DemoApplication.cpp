@@ -63,6 +63,7 @@ void Application::draw()
 	m_program->bind();
 	// shader unifroms
 	m_program->uniform_Matrix4("mvp", 1, false, MVP);
+	m_program->uniform_Matrix4("mv", 1, false, MV);
 		// draw the Trajectory joint
 		m_mesh[m_currentState]->draw(0);
 		m_mesh[m_currentState]->drawObject();
@@ -89,7 +90,6 @@ void Application::update(float dt)
 
 	m_controller.update(dt);
 
-	std::cout << m_controller.getRightStick().x << std::endl;
 	if (fabs(m_controller.getRightStick().x) > 0.75f)
 	{
 		// change state and update next animation cycle trajectory poisiton
@@ -134,7 +134,7 @@ void Application::update(float dt)
 			std::cout << m_eventCode << std::endl;
 	#endif
 
-	m_mesh[m_currentState]->update(dt, m_events, m_controller);
+	m_mesh[m_currentState]->update(dt, m_currentFrame, m_events, m_controller);
 	
 	// get the Trajectory joint position
 	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
