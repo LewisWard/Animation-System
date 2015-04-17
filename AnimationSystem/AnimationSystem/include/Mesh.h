@@ -38,6 +38,7 @@ struct jointCluster
 	int joint; ///< joint index
 	glm::mat4x3 bindPose; ///< bind pose in inverse world space
 	std::vector<int> verts; ///< indices of the vertices within this joint cluster
+	std::vector<glm::vec3> connectedVerts; ///< the connected vertices
 };
 
 struct jointMap

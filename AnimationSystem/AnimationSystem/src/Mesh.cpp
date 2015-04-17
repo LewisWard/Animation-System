@@ -28,7 +28,9 @@
    rotations[f].w									///< quat (vec4)
    jointCluster	name							///< string
    jointCluster connections				///< uint32_t
-   indices of the connections			///< uint32_t
+   positions[f].x	conection				///< vec3
+   positions[f].y	conection				///< vec3
+   positions[f].z	conection				///< vec3
 	 vertexPositions[f].x						///< vec3
    vertexPositions[f].y 					///< vec3
    vertexPositions[f].z 					///< vec3
@@ -94,8 +96,6 @@ Mesh::Mesh(const char* rig)
 		for (size_t i = 0; i < m_indices.size(); ++i)
 			m_indices[i] = i;
 
-		std::cout << frames << std::endl << joints << std::endl;
-
 		// read vertex and rotation data
 		for (size_t frame = 0; frame < (joints * frames); ++frame)
 		{
@@ -139,13 +139,16 @@ Mesh::Mesh(const char* rig)
 					break;
 				}
 			}
+
 			// assign the index and resize the vertives
 			tempCluster.joint = jointIndex;
-			tempCluster.verts.resize(jointClusterCount);
+			//tempCluster.verts.resize(jointClusterCount);
+			tempCluster.connectedVerts.resize(jointClusterCount);
 
 			for (int i = 0; i < jointClusterCount; ++i)
 			{
-				ifs >> tempCluster.verts[i];
+				//ifs >> tempCluster.verts[i];
+				ifs >> tempCluster.connectedVerts[i].x >> tempCluster.connectedVerts[i].y >> tempCluster.connectedVerts[i].z;
 			}
 
 			// add joint cluster
@@ -162,16 +165,30 @@ Mesh::Mesh(const char* rig)
 			vertices[vertex] = meshData;
 		}
 
-		int indexA, indexB, indexC;
 
-		for (size_t index = 0; index < indexCount; index += 3)
+		int indexA;
+
+		// store the indices
+		for (size_t index = 0; index < indexCount; index++)
 		{
-			ifs >> indexA >> indexB >> indexC;
-
-			// store the values
+			ifs >> indexA;	
 			indices[index] = indexA;
-			indices[index + 1] = indexB;
-			indices[index + 2] = indexC;
+		}
+
+		// compares connected vertex vs all the vertices within the mesh, in order to get all indices for 
+		// the same vertex
+		for (int j = 0; j < m_jointCluster.size(); ++j)
+		{
+			for (int i = 0; i < m_jointCluster[j].connectedVerts.size(); ++i)
+			{
+				for (int ii = 0; ii < vertices.size(); ++ii)
+				{
+					if (m_jointCluster[j].connectedVerts[i] == vertices[ii].V)
+					{
+						m_jointCluster[j].verts.push_back(ii);
+					}
+				}
+			}
 		}
 
 		// close the file
@@ -246,7 +263,7 @@ Mesh::Mesh(const char* rig)
 	}
 
 	m_rMesh.originalMesh = new mesh();
-	m_rMesh.originalMesh->verts.resize(m_rMesh.deformed.size());
+	m_rMesh.originalMesh->verts.resize(m_vertices);
 
 
 	m_rMesh.meshData.resize(m_vertices);
@@ -309,7 +326,7 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 	position.y = m_modelMatrix[3].y;
 	position.z = m_modelMatrix[3].z;
 
-	std::cout << position.x << " " << position.y << " " << position.z << std::endl;
+	//std::cout << position.x << " " << position.y << " " << position.z << std::endl;
 
 	position.x += rStick.x * 5.0f * dt;
 	position.y += rStick.y * 5.0f * dt;
@@ -328,14 +345,12 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 		// cycle all the connections within the cluster
 		for (int i = 0; i < m_jointCluster[j].verts.size(); ++i)
 		{
-			// access triple indices (stored in a row: a = 3 * rowNum, b = 3 * rowNum + 1, c = 3 * rowNum + 2)
-			int tripleA = m_meshDataVertices[3 * m_jointCluster[1].verts[i]];
-			int tripleB = m_meshDataVertices[3 * m_jointCluster[1].verts[i] + 1];
-			int tripleC = m_meshDataVertices[3 * m_jointCluster[1].verts[i] + 2];
+			// get indices
+			int tripleA = m_jointCluster[j].verts[i];
 
 			// get the first and last frame
-			glm::vec3 animFrame(m_rMesh.deformed[24].V);
-			glm::vec3 animFrame1(m_rMesh.deformed[24 + 23].V);
+			glm::vec3 animFrame(m_rMesh.deformed[j * 24].V);
+			glm::vec3 animFrame1(m_rMesh.deformed[j * 24 + 23].V);
 
 			// compute te difference between the frames
 			glm::vec3 frameDiff(animFrame1 - animFrame);
@@ -343,20 +358,16 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 			// for all three vertices within the triangle connected to the joint get it start and end position
 			glm::vec3 jointAA(m_rMesh.originalMesh->verts[tripleA].V);
 			glm::vec3 jointAB(frameDiff + jointAA);
-			glm::vec3 jointBA(m_rMesh.originalMesh->verts[tripleB].V);
-			glm::vec3 jointBB(frameDiff + jointBA);
-			glm::vec3 jointCA(m_rMesh.originalMesh->verts[tripleC].V);
-			glm::vec3 jointCB(frameDiff + jointCA);
+
+			#ifdef _DEBUG
+				std::cout << tripleA << " " << jointAA.x << " " << jointAA.y << " " << jointAA.z << std::endl;
+			#endif
 
 			// linear interpolate all three vertices
 			glm::vec3 lerpedA(glm::lerp(jointAA, jointAB, frame / 24.0f));
-			glm::vec3 lerpedB(glm::lerp(jointBA, jointBB, frame / 24.0f));
-			glm::vec3 lerpedC(glm::lerp(jointCA, jointCB, frame / 24.0f));
 
 			// update current position
 			m_rMesh.meshData[tripleA].V = lerpedA;
-			m_rMesh.meshData[tripleB].V = lerpedB;
-			m_rMesh.meshData[tripleC].V = lerpedC;
 		}
 	}
 	

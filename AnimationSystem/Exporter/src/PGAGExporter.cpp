@@ -63,6 +63,7 @@ void animation::preWrite()
 			MObject elements;
 			MFloatArray weights;
 			MIntArray transformIndex;
+			MPointArray point;
 
 			// get path to the affected element
 			objects.getDagPath(i, skin, elements);
@@ -82,10 +83,14 @@ void animation::preWrite()
 			for (; !it.isDone(); it.next())
 			{
 				transformIndex.append(it.index());
+
+				// add the vertex position
+				point.append(it.position() * skin.inclusiveMatrix());
 			}
 
 			// add to array
 			m_transformIndex.push_back(transformIndex);
+			m_clusterPoints.push_back(point);
 		}
 
 		// increase count
@@ -94,7 +99,6 @@ void animation::preWrite()
 		// get next
 		jointIT.next();
 	}
-
 
 	// cycle all objects
 	for (uint32_t mesh = 0; mesh < m_bones.length(); ++mesh)
@@ -238,7 +242,6 @@ void animation::preWrite()
 			polyIT.next();
 		}
 	}
-
 }
 bool animation::write(const char* filename)
 {
@@ -251,15 +254,8 @@ bool animation::write(const char* filename)
 	// write to file
 	ouputFileStream << m_framesNum << std::endl;
 	ouputFileStream << m_jointsNum << std::endl;
-
-	// make sure zero is not printed
-	if (m_vertexArray.size() || m_vertexIndices.size())
-	{
-		ouputFileStream << m_vertexArray.size() << std::endl;
-		ouputFileStream << m_vertexIndices.size() << std::endl;
-	}
-
-	// the total number of joint clusters
+	ouputFileStream << m_vertexArray.size() << std::endl;
+	ouputFileStream << m_vertexIndices.size() << std::endl;
 	ouputFileStream << m_jointClusters << std::endl;
 
 	// output the index and name of the mesh/joint in the scene
@@ -317,10 +313,18 @@ bool animation::write(const char* filename)
 		ouputFileStream << m_transformNames[i] << " " << m_transformWeights[i] << std::endl;
 		int connectionCount = m_transformWeights[i];
 
-		for (int j = 0; j < m_transformIndex[i].length(); ++j)
-		{
-			ouputFileStream << m_transformIndex[i][j] << std::endl;
-		}
+		//for (int j = 0; j < m_transformIndex[i].length(); ++j)
+		//{
+		//	ouputFileStream << m_transformIndex[i][j] << std::endl;
+		//}
+
+		//for (uint32_t i = 0; i < m_clusterPoints.size(); i++)
+		//{
+			for (uint32_t j = 0; j < m_clusterPoints[i].length(); j++)
+			{
+				ouputFileStream << m_clusterPoints[i][j].x << " " << m_clusterPoints[i][j].y << " " << m_clusterPoints[i][j].z << std::endl;
+			}
+		//}
 	}
 
 	// write vertex and index data
@@ -335,21 +339,20 @@ bool animation::write(const char* filename)
 			<< m_vertexArray[kk].UV[0] << " "
 			<< m_vertexArray[kk].UV[1] << std::endl;
 	}
-	for (size_t kk = 0; kk < m_vertexIndices.size(); kk += 3)
+
+
+	for (size_t a = 0; a < m_vertexIndices.size(); a+=3)
 	{
 		// stop it printing out 0, 0, 0 several times that it shouldn't
 		bool tripleZero = false;
-
-		if (m_vertexIndices[kk] == 0 && m_vertexIndices[kk + 1] == 0 && m_vertexIndices[kk + 2] == 0)
-		{
+		
+		if (m_vertexIndices[a] == 0 && m_vertexIndices[a + 1] == 0 && m_vertexIndices[a + 2] == 0)
 			tripleZero = true;
-		}
-
 		
 		if (!tripleZero)
-			ouputFileStream << m_vertexIndices[kk] << " " << m_vertexIndices[kk + 1] << " " << m_vertexIndices[kk + 2] << std::endl;
+			ouputFileStream << m_vertexIndices[a] << " " << m_vertexIndices[a + 1] << " " << m_vertexIndices[a + 2] << std::endl;
 	}
-	
+
 	// close
 	ouputFileStream.close();
 	
