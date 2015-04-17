@@ -146,6 +146,13 @@ void Camera::update(float dt, Event& events, XboxController& controller, glm::ve
 	m_position.x = trajectoryPosition.x;
 	m_position.y = trajectoryPosition.y;
 	m_position.z = trajectoryPosition.z + m_distance; // apply zoom
+
+	// compute zoom
+	if (controller.getLeftTrigger())
+		m_distance += controller.getLeftTrigger();
+	else if (controller.getRightTrigger())
+		m_distance -= controller.getRightTrigger();
+
 	m_view = glm::translate(glm::mat4(1.0f), m_position);
 
 	// apply rotation
