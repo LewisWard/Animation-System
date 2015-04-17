@@ -47,6 +47,7 @@
 Mesh::Mesh(const char* rig)
 {
 	m_rMesh.originalMesh = nullptr;
+	std::cout << "LOADING ANIMATION MESH FILE: ";
 
 	// open file
 	std::ifstream ifs(rig);
@@ -142,7 +143,6 @@ Mesh::Mesh(const char* rig)
 
 			// assign the index and resize the vertives
 			tempCluster.joint = jointIndex;
-			//tempCluster.verts.resize(jointClusterCount);
 			tempCluster.connectedVerts.resize(jointClusterCount);
 
 			for (int i = 0; i < jointClusterCount; ++i)
@@ -256,53 +256,57 @@ Mesh::Mesh(const char* rig)
 				m_rMesh.deformed[f].V.x = positions[ii].x;
 				m_rMesh.deformed[f].V.y = positions[ii].y;
 				m_rMesh.deformed[f].V.z = positions[ii].z;
-				std::cout << i << " " << k << std::endl;
 				i++;
 			}
 		}
+
+		m_rMesh.originalMesh = new mesh();
+		m_rMesh.originalMesh->verts.resize(m_vertices);
+
+
+		m_rMesh.meshData.resize(m_vertices);
+		for (size_t i = 0; i < m_vertices; ++i)
+		{
+			m_rMesh.meshData[i] = vertices[i];
+			m_rMesh.originalMesh->verts[i] = vertices[i];
+		}
+
+		m_meshDataVertices.resize(m_meshIndices);
+		for (size_t i = 0; i < m_meshIndices; ++i)
+		{
+			m_meshDataVertices[i] = indices[i];
+		}
+
+		// genereate a buffer joint data
+		glGenBuffers(1, &m_vbo);
+		glGenBuffers(1, &m_ibo);
+		// bind
+		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormal)*m_rMesh.deformed.size(), &m_rMesh.deformed[0], GL_STATIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_indices.size(), &m_indices[0], GL_STATIC_DRAW);
+		// unbind
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		// genereate a buffer for the mesh data
+		glGenBuffers(1, &m_vboMesh);
+		glGenBuffers(1, &m_iboMesh);
+		// bind
+		glBindBuffer(GL_ARRAY_BUFFER, m_vboMesh);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormalUV)*m_rMesh.meshData.size(), &m_rMesh.meshData[0], GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboMesh);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_meshDataVertices.size(), &m_meshDataVertices[0], GL_STATIC_DRAW);
+		// unbind
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		std::cout << "LOADED\n";
 	}
-
-	m_rMesh.originalMesh = new mesh();
-	m_rMesh.originalMesh->verts.resize(m_vertices);
-
-
-	m_rMesh.meshData.resize(m_vertices);
-	for (size_t i = 0; i < m_vertices; ++i)
+	else
 	{
-		m_rMesh.meshData[i] = vertices[i];
-		m_rMesh.originalMesh->verts[i] = vertices[i];
+		std::cout << "FAILED\n";
 	}
-
-	m_meshDataVertices.resize(m_meshIndices);
-	for (size_t i = 0; i < m_meshIndices; ++i)
-	{
-		m_meshDataVertices[i] = indices[i];
-	}
-
-	// genereate a buffer joint data
-	glGenBuffers(1, &m_vbo);
-	glGenBuffers(1, &m_ibo);
-	// bind
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormal)*m_rMesh.deformed.size(), &m_rMesh.deformed[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_indices.size(), &m_indices[0], GL_STATIC_DRAW);
-	// unbind
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	// genereate a buffer for the mesh data
-	glGenBuffers(1, &m_vboMesh);
-	glGenBuffers(1, &m_iboMesh);
-	// bind
-	glBindBuffer(GL_ARRAY_BUFFER, m_vboMesh);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormalUV)*m_rMesh.meshData.size(), &m_rMesh.meshData[0], GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboMesh);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_meshDataVertices.size(), &m_meshDataVertices[0], GL_STATIC_DRAW);
-	// unbind
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 }
 Mesh::~Mesh()
 {
@@ -358,10 +362,6 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 			// for all three vertices within the triangle connected to the joint get it start and end position
 			glm::vec3 jointAA(m_rMesh.originalMesh->verts[tripleA].V);
 			glm::vec3 jointAB(frameDiff + jointAA);
-
-			#ifdef _DEBUG
-				std::cout << tripleA << " " << jointAA.x << " " << jointAA.y << " " << jointAA.z << std::endl;
-			#endif
 
 			// linear interpolate all three vertices
 			glm::vec3 lerpedA(glm::lerp(jointAA, jointAB, frame / 24.0f));

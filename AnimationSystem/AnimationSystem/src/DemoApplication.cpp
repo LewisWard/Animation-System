@@ -129,9 +129,6 @@ void Application::update(float dt)
 			m_currentState = Idle;
 			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 		}
-
-		if (m_eventCode)
-			std::cout << m_eventCode << std::endl;
 	#endif
 
 	m_mesh[m_currentState]->update(dt, m_currentFrame, m_events, m_controller);
