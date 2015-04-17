@@ -313,18 +313,10 @@ bool animation::write(const char* filename)
 		ouputFileStream << m_transformNames[i] << " " << m_transformWeights[i] << std::endl;
 		int connectionCount = m_transformWeights[i];
 
-		//for (int j = 0; j < m_transformIndex[i].length(); ++j)
-		//{
-		//	ouputFileStream << m_transformIndex[i][j] << std::endl;
-		//}
-
-		//for (uint32_t i = 0; i < m_clusterPoints.size(); i++)
-		//{
-			for (uint32_t j = 0; j < m_clusterPoints[i].length(); j++)
-			{
-				ouputFileStream << m_clusterPoints[i][j].x << " " << m_clusterPoints[i][j].y << " " << m_clusterPoints[i][j].z << std::endl;
-			}
-		//}
+		for (uint32_t j = 0; j < m_clusterPoints[i].length(); j++)
+		{
+			ouputFileStream << m_clusterPoints[i][j].x << " " << m_clusterPoints[i][j].y << " " << m_clusterPoints[i][j].z << std::endl;
+		}
 	}
 
 	// write vertex and index data
