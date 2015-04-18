@@ -29,6 +29,7 @@ struct vertNormalUV
 
 struct mesh
 {
+	std::vector<glm::quat> quats;
 	std::vector<vertNormalUV> verts;
 	std::vector<int> indices;
 };
@@ -52,6 +53,7 @@ struct rigidSkinnedMesh
 	mesh* originalMesh;
 	std::vector<jointCluster> clusters;
 	std::vector<vertNormal> deformed;
+	std::vector<glm::quat> deformedRotations;
 	std::vector<vertNormalUV> meshData;
 };
 

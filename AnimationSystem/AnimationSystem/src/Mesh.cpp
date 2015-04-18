@@ -233,6 +233,7 @@ Mesh::Mesh(const char* rig)
 			m_rMesh.clusters[j].bindPose = bind;
 
 			m_rMesh.deformed.resize(joints * frames);
+			m_rMesh.deformedRotations.resize(joints * frames);
 
 			int i = 0;
 			int k = 0;
@@ -256,19 +257,34 @@ Mesh::Mesh(const char* rig)
 				m_rMesh.deformed[f].V.x = positions[ii].x;
 				m_rMesh.deformed[f].V.y = positions[ii].y;
 				m_rMesh.deformed[f].V.z = positions[ii].z;
+				m_rMesh.deformedRotations[f].x = rotations[ii].x;
+				m_rMesh.deformedRotations[f].y = rotations[ii].y;
+				m_rMesh.deformedRotations[f].z = rotations[ii].z;
+				m_rMesh.deformedRotations[f].w = rotations[ii].w;
 				i++;
 			}
 		}
 
+		// create original mesh
 		m_rMesh.originalMesh = new mesh();
 		m_rMesh.originalMesh->verts.resize(m_vertices);
-
-
+		m_rMesh.originalMesh->quats.resize(rotations.size());
 		m_rMesh.meshData.resize(m_vertices);
+
+		// load original vertices
 		for (size_t i = 0; i < m_vertices; ++i)
 		{
 			m_rMesh.meshData[i] = vertices[i];
 			m_rMesh.originalMesh->verts[i] = vertices[i];
+		}
+
+		// load original quats
+		for (size_t i = 0; i < rotations.size(); ++i)
+		{
+			m_rMesh.originalMesh->quats[i].x = rotations[i].x;
+			m_rMesh.originalMesh->quats[i].y = rotations[i].y;
+			m_rMesh.originalMesh->quats[i].z = rotations[i].z;
+			m_rMesh.originalMesh->quats[i].w = rotations[i].w;
 		}
 
 		m_meshDataVertices.resize(m_meshIndices);
@@ -344,8 +360,9 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 	//m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
 
 	// cycle all joint clusters
-	for (int j = 0; j < m_jointCluster.size(); ++j)
+	for (int j = 2; j < m_jointCluster.size(); ++j)
 	{
+		std::cout << j << std::endl;
 		// cycle all the connections within the cluster
 		for (int i = 0; i < m_jointCluster[j].verts.size(); ++i)
 		{
@@ -366,12 +383,16 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 			// linear interpolate all three vertices
 			glm::vec3 lerpedA(glm::lerp(jointAA, jointAB, frame / 24.0f));
 
+			// get the rotation for this frame and rotate the lerped vertices
+			glm::quat rotation(m_rMesh.deformedRotations[j * 24 + frame]);
+			glm::vec3 lerpedRot = glm::rotate(rotation, lerpedA);
+			
 			// update current position
-			m_rMesh.meshData[tripleA].V = lerpedA;
+			m_rMesh.meshData[tripleA].V = lerpedRot;
 		}
 	}
 	
-	// update the mesh data within the VBO 
+	// update the mesh data within the VBO, this could be better done for perfomance!
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboMesh);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertNormalUV)*m_rMesh.meshData.size(), &m_rMesh.meshData[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
