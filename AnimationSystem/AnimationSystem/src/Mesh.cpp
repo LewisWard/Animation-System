@@ -360,9 +360,11 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 	//m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
 
 	// cycle all joint clusters
-	for (int j = 2; j < m_jointCluster.size(); ++j)
+	for (int j = 0; j < m_jointCluster.size(); ++j)
 	{
-		std::cout << j << std::endl;
+		// data stored in array always starts at the Hips, so minus one to make index match order
+		int jointClusterIndex = m_jointCluster[j].joint - 1;
+
 		// cycle all the connections within the cluster
 		for (int i = 0; i < m_jointCluster[j].verts.size(); ++i)
 		{
@@ -384,9 +386,9 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 			glm::vec3 lerpedA(glm::lerp(jointAA, jointAB, frame / 24.0f));
 
 			// get the rotation for this frame and rotate the lerped vertices
-			glm::quat rotation(m_rMesh.deformedRotations[j * 24 + frame]);
+			glm::quat rotation(m_rMesh.deformedRotations[jointClusterIndex * 24 + frame]);
 			glm::vec3 lerpedRot = glm::rotate(rotation, lerpedA);
-			
+
 			// update current position
 			m_rMesh.meshData[tripleA].V = lerpedRot;
 		}
