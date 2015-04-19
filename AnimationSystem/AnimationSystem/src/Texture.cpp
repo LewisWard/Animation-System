@@ -22,7 +22,12 @@ Texture::Texture(const char* texture)
 		glBindTexture(GL_TEXTURE_2D, m_texture);
 		
 		// select the right texture data for texture
-		if (imageSurface->format->BytesPerPixel == 4)
+		if (imageSurface->format->BytesPerPixel == 3)
+		{
+			// texture data (PNG without Alpha channel)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageSurface->w, imageSurface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, imageSurface->pixels);
+		}
+		else if (imageSurface->format->BytesPerPixel == 4)
 		{
 			// texture data (PNG with Alpha channel)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageSurface->w, imageSurface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageSurface->pixels);

@@ -20,25 +20,47 @@ Application::Application()
 		m_mesh[0] = new Mesh(ANIMPATH"Idle.amesh");
 		m_mesh[1] = new Mesh(ANIMPATH"Walk.amesh");
 
+		m_object = new Object("meshes/example.meshes");
+
+		m_texture = new Texture("images/example.png");
+
+		glm::mat4 scale;
+		scale[0].x = 2;
+		scale[1].y = 2;
+		scale[2].z = 2;
+		m_object->scale(scale);
+
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
 		m_currentFrame = 0.0f;
 
 		m_program = new gls::Program();
+		m_objects = new gls::Program();
 
 		// create an array of all shaders to load
 		gls::Shader shaders[] = {
 			gls::Shader("shaders/joint.vtx.glsl", gls::sVERTEX), ///< joint vertex shader
 			gls::Shader("shaders/joint.pix.glsl", gls::sFRAGMENT), ///< joint fragment shader
+			gls::Shader("shaders/object.vtx.glsl", gls::sVERTEX), ///< object vertex shader
+			gls::Shader("shaders/object.pix.glsl", gls::sFRAGMENT), ///< object fragment shader
 		};
 		
+		// create shader programs
 		m_program->create(&shaders[0], &shaders[1]);
+		m_objects->create(&shaders[2], &shaders[3]);
 	}
 }
 Application::~Application()
 {
+	delete m_texture;
 	delete m_program;
+	delete m_objects;
 	m_program = nullptr;
+	m_objects = nullptr;
+
+	delete[] m_mesh;
+	delete m_object;
+	m_object = nullptr;
 }
 void Application::draw()
 {
@@ -53,10 +75,10 @@ void Application::draw()
 	glm::mat4x4 MVP;
 	glm::mat4x4 V = m_camera.get()->viewMatrix();
 	glm::mat4x4 P = m_camera.get()->projectionMatrix();
-	glm::mat4 m_model = m_mesh[m_currentState]->getModelMatrix();
+	glm::mat4 model = m_mesh[m_currentState]->getModelMatrix();
 
 	// compute the Model-View-Project Matrix
-	glm::mat4x4 MV = V * m_model;
+	glm::mat4x4 MV = V * model;
 	MVP = P * MV;
 
 	// bind the program
@@ -75,6 +97,27 @@ void Application::draw()
 	// unbind program and texture
 	m_program->unbind();
 
+	std::cout << MVP[3].x << " " << MVP[3].y << " " << MVP[3].z << " " << MVP[3].w << std::endl;
+
+	MV = V * m_object->matrix();;
+	MVP = P * MV;
+
+	m_objects->bind();
+
+		m_texture->bind(0);
+
+		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
+		m_objects->uniform_Matrix4("mv", 1, false, MV);
+		m_objects->uniform_1i("texture", 0);
+		m_objects->uniform_4f("ambient", 0.0f, 0.0f, 0.3f, 1.0f);
+		m_objects->uniform_4f("diffuse", 1.0f, 1.0f, 1.0f, 1.0f);
+		m_objects->uniform_4f("specular", 0.0f, 0.0f, 0.15f, 1.0f);
+		
+		m_object->draw();
+
+		m_texture->unbind();
+
+	m_objects->unbind();
 	
 	// disable OpenGL textures and depth testing
 	glDisable(GL_TEXTURE_2D);

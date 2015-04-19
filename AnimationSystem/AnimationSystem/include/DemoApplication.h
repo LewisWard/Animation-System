@@ -18,6 +18,7 @@
 
 #pragma once
 #include "Mesh.h"
+#include "Object.h"
 #include "Camera.h"
 #include "gl/Program.h"
 #include <memory>
@@ -61,8 +62,11 @@ private:
 	animCycle m_currentState;
 	float m_currentFrame;
 	gls::Program* m_program;
+	gls::Program* m_objects;
 	std::shared_ptr<Camera> m_camera;
 	int m_eventCode;
 	XboxController m_controller;
 	glm::mat4 m_trajectoryJoint;
+	Object* m_object;
+	Texture* m_texture;
 };
