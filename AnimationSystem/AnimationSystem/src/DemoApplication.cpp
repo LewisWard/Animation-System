@@ -17,18 +17,20 @@ Application::Application()
 	}
 	else
 	{
-		m_mesh[0] = new Mesh(ANIMPATH"Idle.amesh");
-		m_mesh[1] = new Mesh(ANIMPATH"Walk.amesh");
+		m_mesh[0] = new Mesh(ANIMPATH"ExoIdle.amesh");
+		m_mesh[1] = new Mesh(ANIMPATH"ExoWalk.amesh");
 
 		m_object = new Object("meshes/example.meshes");
 
 		m_texture = new Texture("images/example.png");
 
+		// scale and rotate the object
 		glm::mat4 scale;
 		scale[0].x = 2;
 		scale[1].y = 2;
 		scale[2].z = 2;
 		m_object->scale(scale);
+		m_object->rotate(0.0f, -90.0f);
 
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
@@ -87,25 +89,36 @@ void Application::draw()
 	m_program->uniform_Matrix4("mvp", 1, false, MVP);
 	m_program->uniform_Matrix4("mv", 1, false, MV);
 		// draw the Trajectory joint
-		m_mesh[m_currentState]->draw(0);
-		m_mesh[m_currentState]->drawObject();
+		//m_mesh[m_currentState]->draw(0);
+		//m_mesh[m_currentState]->drawObject();
 		for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh[m_currentState]->numberOfFrames(); i += m_mesh[m_currentState]->numberOfFrames())
 		{
-			m_mesh[m_currentState]->draw(i);
-			m_mesh[m_currentState]->drawObject(i);
+			//m_mesh[m_currentState]->draw(i);
+			//m_mesh[m_currentState]->drawObject(i);
 		}
 	// unbind program and texture
 	m_program->unbind();
 
-	std::cout << MVP[3].x << " " << MVP[3].y << " " << MVP[3].z << " " << MVP[3].w << std::endl;
 
-	MV = V * m_object->matrix();;
-	MVP = P * MV;
 
+	// bind program
 	m_objects->bind();
-
+		//bind texture
 		m_texture->bind(0);
 
+		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
+		m_objects->uniform_Matrix4("mv", 1, false, MV);
+
+		m_mesh[m_currentState]->drawObject();
+		for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh[m_currentState]->numberOfFrames(); i += m_mesh[m_currentState]->numberOfFrames())
+			m_mesh[m_currentState]->drawObject(i);
+
+
+		// recompute MV/MVP matrix
+		MV = V * m_object->matrix();;
+		MVP = P * MV;
+
+		// set shader uniforms
 		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
 		m_objects->uniform_1i("texture", 0);
@@ -113,12 +126,16 @@ void Application::draw()
 		m_objects->uniform_4f("diffuse", 1.0f, 1.0f, 1.0f, 1.0f);
 		m_objects->uniform_4f("specular", 0.0f, 0.0f, 0.15f, 1.0f);
 		
+		// draw
 		m_object->draw();
 
+		// unbind texture
 		m_texture->unbind();
 
+	// unbind program
 	m_objects->unbind();
 	
+
 	// disable OpenGL textures and depth testing
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_DEPTH_TEST);

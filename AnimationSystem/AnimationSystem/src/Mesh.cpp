@@ -387,10 +387,11 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 
 			// get the rotation for this frame and rotate the lerped vertices
 			glm::quat rotation(m_rMesh.deformedRotations[jointClusterIndex * 24 + frame]);
+
 			glm::vec3 lerpedRot = glm::rotate(rotation, lerpedA);
 
 			// update current position
-			m_rMesh.meshData[tripleA].V = lerpedRot;
+			m_rMesh.meshData[tripleA].V = lerpedA;
 		}
 	}
 	
