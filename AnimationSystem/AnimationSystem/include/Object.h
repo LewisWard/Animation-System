@@ -40,6 +40,6 @@ private:
 	uint32_t m_vbo; ///< VBO
 	uint32_t m_ibo; ///< IBO
 	glm::mat4 m_matrix; ///< model matrix
-	glm::vec3 m_dirX; ///< for working out the 'up' direction of the camera
-	glm::vec3 m_dirY; ///< for working out the 'up' direction of the camera
+	glm::vec3 m_dirX; ///< for working out the 'up' direction of the object
+	glm::vec3 m_dirY; ///< for working out the 'up' direction of the object
 };

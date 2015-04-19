@@ -10,6 +10,9 @@
 	 the Hips (provided named in Maya) without the Trajectory or Hips joint the plugin will crash Maya!
 	 Any other joint after the first 2 joints can be called anything you like.
 
+	 NOTE: make sure the nmber of vertices is divisible by 3, otherwise the plugin will throw an expection
+	 and crash Maya as it cannot output a set (triple) of indices!
+
 // ------------------------------------------  File structure  ------------------------------------------ //
    framesNum											///< uint32_t
    jointsNum											///< uint32_t
@@ -47,6 +50,12 @@
 Mesh::Mesh(const char* rig)
 {
 	m_rMesh.originalMesh = nullptr;
+
+	m_dirX = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_dirY = glm::vec3(0.0f, 1.0f, 0.0f);
+	m_direction = glm::vec3(0.0f, 0.0f, -1.0f);
+	m_hAngle = 0.0f;
+
 	std::cout << "LOADING ANIMATION MESH FILE: ";
 
 	// open file
@@ -346,18 +355,26 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 	position.y = m_modelMatrix[3].y;
 	position.z = m_modelMatrix[3].z;
 
-	//std::cout << position.x << " " << position.y << " " << position.z << std::endl;
+	m_direction = glm::normalize(m_direction);
+	glm::vec3 newDirection(m_direction);
+	glm::vec3 translation;
+	newDirection = newDirection * m_facing;
+	translation = newDirection;
 
-	position.x += rStick.x * 5.0f * dt;
-	position.y += rStick.y * 5.0f * dt;
+	// invert the X 
+	translation.x = -translation.x;
+	translation *= rStick.y * 2.5f * dt;
+	std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
+
+	// move
+	position += translation;
 	m_modelMatrix = glm::translate(position);
-	//m_view = glm::translate(glm::mat4(1.0f), position);
 
 	// apply rotation
-	//m_vAngle += lStick.y;
-	//m_hAngle += lStick.x;
-	//m_view = glm::rotate(m_view, glm::radians(m_vAngle), m_dirX); // vertical
-	//m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
+	m_hAngle += -rStick.x * 5.0f * dt;
+	m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
+	m_facing = glm::quat_cast(m_modelMatrix);
+
 
 	// cycle all joint clusters
 	for (int j = 0; j < m_jointCluster.size(); ++j)
@@ -494,11 +511,11 @@ void Mesh::drawObject()
 	glEnableVertexAttribArray(0);
 
 	// enable normal
-	glVertexAttribPointer(1, 3, GL_FLOAT, true, sizeof(vertNormalUV), coordinate + 4);
+	glVertexAttribPointer(1, 3, GL_FLOAT, true, sizeof(vertNormalUV), coordinate + 3);
 	glEnableVertexAttribArray(1);
 	
 	// enable UV
-	glVertexAttribPointer(2, 2, GL_FLOAT, true, sizeof(vertNormalUV), coordinate + 8);
+	glVertexAttribPointer(2, 2, GL_FLOAT, true, sizeof(vertNormalUV), coordinate + 6);
 	glEnableVertexAttribArray(2);
 
 	// draw

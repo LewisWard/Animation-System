@@ -66,8 +66,6 @@ private:
 
 	int m_lastX;
 	int m_lastY;
-	float m_rotX;
-	float m_rotY;
 
 	glm::vec3 m_position; ///< camera position
 	glm::vec3 m_dirX; ///< for working out the 'up' direction of the camera

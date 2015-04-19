@@ -6,17 +6,18 @@
 Camera::Camera(float windowW, float windowH)
 {
 	m_hAngle = 0.0f;
-	m_vAngle = 0.0f;
-	m_distance = -75.0f;
+	m_vAngle = 25.0f;
+	m_distance = -120.0f;
 
-	m_position = glm::vec3(0.0f, 0.0f, m_distance);
+	m_position = glm::vec3(0.0f, -55.0f, m_distance);
 	m_dirX = glm::vec3(1.0f, 0.0f, 0.0f);
 	m_dirY = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	m_rotX = 0.0f;
-	m_rotY = 0.0f;
 	m_lastX = windowW / 2;
 	m_lastY = windowH / 2;
+
+	// rotate camera
+	m_view = glm::rotate(m_view, glm::radians(m_vAngle), m_dirX); // vertical
 
 	// based upon code found here: http://glm.g-truc.net/0.9.4/code.html
 	m_projection = glm::perspective(45.0f, windowW / windowH, 0.1f, 1000.0f);

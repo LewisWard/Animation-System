@@ -13,6 +13,7 @@
 #include "glm/gtx/transform.hpp"
 #include "glm/gtx/compatibility.hpp"
 #include "glm/gtx/quaternion.hpp"
+#include "glm/gtx/rotate_vector.hpp"
 #include <iostream>
 #include <Windows.h>
 #include <cstdint>

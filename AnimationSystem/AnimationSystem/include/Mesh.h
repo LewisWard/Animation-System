@@ -112,4 +112,10 @@ private:
 	int m_vertices;
 	int m_meshIndices;
 	int m_jointClusterCount;
+	glm::vec3 m_dirX; ///< for working out the 'up' direction of the mesh
+	glm::vec3 m_dirY; ///< for working out the 'up' direction of the mesh
+	float m_vAngle;
+	float m_hAngle;
+	glm::vec3 m_direction;
+	glm::quat m_facing;
 };
