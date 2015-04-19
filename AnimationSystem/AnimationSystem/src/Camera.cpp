@@ -20,11 +20,6 @@ Camera::Camera(float windowW, float windowH)
 
 	// based upon code found here: http://glm.g-truc.net/0.9.4/code.html
 	m_projection = glm::perspective(45.0f, windowW / windowH, 0.1f, 1000.0f);
-
-	//glm::mat4 ViewTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -2.0f));
-	//glm::mat4 ViewRotateX = glm::rotate(ViewTranslate, 0.0f, glm::vec3(-1.0f, 0.0f, 0.0f));
-	//m_view = glm::rotate(ViewRotateX, 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	//m_model = glm::scale(glm::mat4(1.0f), glm::vec3(0.75f));
 }
 Camera::~Camera()
 {

@@ -27,6 +27,10 @@ public:
 	inline void scale(glm::mat4 matrix)
 	{ m_matrix *= matrix; }
 
+	void rotate(float x, float y);
+
+	glm::vec3 getTranslation();
+
 	inline glm::mat4 matrix()
 	{ return m_matrix; }
 
@@ -36,4 +40,6 @@ private:
 	uint32_t m_vbo; ///< VBO
 	uint32_t m_ibo; ///< IBO
 	glm::mat4 m_matrix; ///< model matrix
+	glm::vec3 m_dirX; ///< for working out the 'up' direction of the camera
+	glm::vec3 m_dirY; ///< for working out the 'up' direction of the camera
 };

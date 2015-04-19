@@ -7,6 +7,9 @@ Object::Object(const char* meshFile)
 {
 	std::cout << "LOADING OBJECT MESH FILE: ";
 
+	m_dirX = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_dirY = glm::vec3(0.0f, 1.0f, 0.0f);
+
 	// gen buffers
 	glGenBuffers(1, &m_vbo);
 	glGenBuffers(1, &m_ibo);
@@ -109,4 +112,18 @@ void Object::draw()
 	// empty buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+glm::vec3 Object::getTranslation()
+{
+	glm::vec3 translation;
+	translation.x = m_matrix[3].x;
+	translation.y = m_matrix[3].y;
+	translation.z = m_matrix[3].z;
+
+	return translation;
+}
+void Object::rotate(float x, float y)
+{
+	m_matrix = glm::rotate(m_matrix, glm::radians(x), m_dirX); // vertical
+	m_matrix = glm::rotate(m_matrix, glm::radians(y), m_dirY); // horizontal
 }
