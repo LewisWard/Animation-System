@@ -69,4 +69,5 @@ private:
 	glm::mat4 m_trajectoryJoint;
 	Object* m_object;
 	Texture* m_texture;
+	Texture* m_exoTexture;
 };

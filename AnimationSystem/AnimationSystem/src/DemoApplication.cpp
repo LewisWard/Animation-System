@@ -17,12 +17,13 @@ Application::Application()
 	}
 	else
 	{
-		m_mesh[0] = new Mesh(ANIMPATH"ExoIdle.amesh");
-		m_mesh[1] = new Mesh(ANIMPATH"ExoWalk.amesh");
+		m_mesh[0] = new Mesh(ANIMPATH"testIdle.amesh");
+		m_mesh[1] = new Mesh(ANIMPATH"testWalk.amesh");
 
 		m_object = new Object("meshes/example.meshes");
 
 		m_texture = new Texture("images/example.png");
+		m_exoTexture = new Texture("images/Exo.png");
 
 		// scale and rotate the object
 		glm::mat4 scale;
@@ -55,6 +56,7 @@ Application::Application()
 Application::~Application()
 {
 	delete m_texture;
+	delete m_exoTexture;
 	delete m_program;
 	delete m_objects;
 	m_program = nullptr;
@@ -83,21 +85,21 @@ void Application::draw()
 	glm::mat4x4 MV = V * model;
 	MVP = P * MV;
 
-	// bind the program
-	m_program->bind();
-	// shader unifroms
-	m_program->uniform_Matrix4("mvp", 1, false, MVP);
-	m_program->uniform_Matrix4("mv", 1, false, MV);
-		// draw the Trajectory joint
-		//m_mesh[m_currentState]->draw(0);
-		//m_mesh[m_currentState]->drawObject();
-		for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh[m_currentState]->numberOfFrames(); i += m_mesh[m_currentState]->numberOfFrames())
-		{
-			//m_mesh[m_currentState]->draw(i);
-			//m_mesh[m_currentState]->drawObject(i);
-		}
-	// unbind program and texture
-	m_program->unbind();
+	//// bind the program
+	//m_program->bind();
+	//// shader unifroms
+	//m_program->uniform_Matrix4("mvp", 1, false, MVP);
+	//m_program->uniform_Matrix4("mv", 1, false, MV);
+	//	// draw the Trajectory joint
+	//	//m_mesh[m_currentState]->draw(0);
+	//	//m_mesh[m_currentState]->drawObject();
+	//	for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh[m_currentState]->numberOfFrames(); i += m_mesh[m_currentState]->numberOfFrames())
+	//	{
+	//		//m_mesh[m_currentState]->draw(i);
+	//		//m_mesh[m_currentState]->drawObject(i);
+	//	}
+	//// unbind program and texture
+	//m_program->unbind();
 
 
 
@@ -105,9 +107,14 @@ void Application::draw()
 	m_objects->bind();
 		//bind texture
 		m_texture->bind(0);
+		m_exoTexture->bind(1);
 
 		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
+		m_objects->uniform_1i("texture", 1);
+		m_objects->uniform_4f("ambient", 0.0f, 0.0f, 0.3f, 1.0f);
+		m_objects->uniform_4f("diffuse", 1.0f, 1.0f, 1.0f, 1.0f);
+		m_objects->uniform_4f("specular", 0.5f, 0.5f, 0.55f, 1.0f);
 
 		m_mesh[m_currentState]->drawObject();
 		for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh[m_currentState]->numberOfFrames(); i += m_mesh[m_currentState]->numberOfFrames())
@@ -122,8 +129,6 @@ void Application::draw()
 		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
 		m_objects->uniform_1i("texture", 0);
-		m_objects->uniform_4f("ambient", 0.0f, 0.0f, 0.3f, 1.0f);
-		m_objects->uniform_4f("diffuse", 1.0f, 1.0f, 1.0f, 1.0f);
 		m_objects->uniform_4f("specular", 0.0f, 0.0f, 0.15f, 1.0f);
 		
 		// draw
@@ -131,6 +136,7 @@ void Application::draw()
 
 		// unbind texture
 		m_texture->unbind();
+		m_exoTexture->unbind();
 
 	// unbind program
 	m_objects->unbind();

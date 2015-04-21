@@ -389,8 +389,8 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 			int tripleA = m_jointCluster[j].verts[i];
 
 			// get the first and last frame
-			glm::vec3 animFrame(m_rMesh.deformed[j * 24].V);
-			glm::vec3 animFrame1(m_rMesh.deformed[j * 24 + 23].V);
+			glm::vec3 animFrame(m_rMesh.deformed[jointClusterIndex * NUM_OF_FRAMES].V);
+			glm::vec3 animFrame1(m_rMesh.deformed[jointClusterIndex * NUM_OF_FRAMES + NUM_OF_FRAMES - 1].V);
 
 			// compute te difference between the frames
 			glm::vec3 frameDiff(animFrame1 - animFrame);
@@ -400,10 +400,10 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 			glm::vec3 jointAB(frameDiff + jointAA);
 
 			// linear interpolate all three vertices
-			glm::vec3 lerpedA(glm::lerp(jointAA, jointAB, frame / 24.0f));
+			glm::vec3 lerpedA(glm::lerp(jointAA, jointAB, frame / (float)NUM_OF_FRAMES));
 
 			// get the rotation for this frame and rotate the lerped vertices
-			glm::quat rotation(m_rMesh.deformedRotations[jointClusterIndex * 24 + frame]);
+			glm::quat rotation(m_rMesh.deformedRotations[jointClusterIndex * (float)NUM_OF_FRAMES + frame]);
 
 			glm::vec3 lerpedRot = glm::rotate(rotation, lerpedA);
 
