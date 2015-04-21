@@ -27,6 +27,8 @@ public:
 	inline void scale(glm::mat4 matrix)
 	{ m_matrix *= matrix; }
 
+	void translate(glm::vec3 vector);
+
 	void rotate(float x, float y);
 
 	glm::vec3 getTranslation();

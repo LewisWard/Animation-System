@@ -70,16 +70,10 @@ void Camera::update(float dt, Event& events, XboxController& controller, glm::ma
 	m_model[3].y = trajectoryPosition[3].y;// + 50.0f;
 	m_model[3].z = trajectoryPosition[3].z;// + m_distance; // apply 
 	
-	glm::mat4 viewV = glm::rotate(m_model, glm::radians(m_vAngle), m_dirX); // vertical
-	glm::mat4 viewH = glm::rotate(viewV, glm::radians(m_hAngle), m_dirY); // horizontal
+	glm::mat4 viewH = glm::rotate(m_model, glm::radians(m_hAngle), m_dirY); // horizontal
 
 	// get final view matrix
 	m_view = glm::inverse(glm::translate(viewH, offset));
-
-	std::cout << "traj  :" << trajectoryPosition[3].x << " " << trajectoryPosition[3].y << " " << trajectoryPosition[3].z << std::endl;
-	std::cout << "quat  :" << offset.x << " " << offset.y << " " << offset.z << std::endl;
-	std::cout << "model :" << m_model[3].x << " " << m_model[3].y << " " << m_model[3].z << std::endl;
-	std::cout << "view  :" << m_view[3].x << " " << m_view[3].y << " " << m_view[3].z << std::endl;
 }
 void Camera::verticalMove(float dt, int difference)
 {

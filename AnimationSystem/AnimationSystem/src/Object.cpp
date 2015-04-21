@@ -127,3 +127,7 @@ void Object::rotate(float x, float y)
 	m_matrix = glm::rotate(m_matrix, glm::radians(x), m_dirX); // vertical
 	m_matrix = glm::rotate(m_matrix, glm::radians(y), m_dirY); // horizontal
 }
+void Object::translate(glm::vec3 vector)
+{
+	m_matrix[3] = glm::vec4(vector, 1.0f);
+}

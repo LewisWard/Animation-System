@@ -32,6 +32,7 @@ Application::Application()
 		scale[2].z = 2;
 		m_object->scale(scale);
 		m_object->rotate(0.0f, -90.0f);
+		m_object->translate(glm::vec3(10.0f, 0.0f, 2.0f));
 
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
@@ -180,6 +181,8 @@ void Application::update(float dt)
 	
 	// get the Trajectory joint position
 	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
+
+	std::cout << m_currentState << " " << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
 	
 	m_camera->update(dt, m_events, m_controller, m_trajectoryJoint);
 
