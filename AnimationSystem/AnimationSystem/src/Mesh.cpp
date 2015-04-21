@@ -355,6 +355,7 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 	position.y = m_modelMatrix[3].y;
 	position.z = m_modelMatrix[3].z;
 
+	// compute the direction facing to walk in
 	m_direction = glm::normalize(m_direction);
 	glm::vec3 newDirection(m_direction);
 	glm::vec3 translation;
@@ -363,8 +364,8 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 
 	// invert the X 
 	translation.x = -translation.x;
-	translation *= rStick.y * 2.5f * dt;
-	std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
+	translation.z = -translation.z;
+	translation *= rStick.y * 5.5f * dt;
 
 	// move
 	position += translation;
@@ -375,6 +376,7 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 	m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
 	m_facing = glm::quat_cast(m_modelMatrix);
 
+	std::cout << m_modelMatrix[3].x << " " << m_modelMatrix[3].y << " " << m_modelMatrix[3].z << std::endl;
 
 	// cycle all joint clusters
 	for (int j = 0; j < m_jointCluster.size(); ++j)
@@ -390,7 +392,7 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 
 			// get the first and last frame
 			glm::vec3 animFrame(m_rMesh.deformed[jointClusterIndex * NUM_OF_FRAMES].V);
-			glm::vec3 animFrame1(m_rMesh.deformed[jointClusterIndex * NUM_OF_FRAMES + NUM_OF_FRAMES - 1].V);
+			glm::vec3 animFrame1(m_rMesh.deformed[jointClusterIndex * NUM_OF_FRAMES + frame].V);
 
 			// compute te difference between the frames
 			glm::vec3 frameDiff(animFrame1 - animFrame);
@@ -404,8 +406,9 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 
 			// get the rotation for this frame and rotate the lerped vertices
 			glm::quat rotation(m_rMesh.deformedRotations[jointClusterIndex * (float)NUM_OF_FRAMES + frame]);
+			rotation = glm::normalize(rotation);
+			glm::vec3 lerpedRot = rotation * lerpedA;
 
-			glm::vec3 lerpedRot = glm::rotate(rotation, lerpedA);
 
 			// update current position
 			m_rMesh.meshData[tripleA].V = lerpedA;

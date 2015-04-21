@@ -17,8 +17,8 @@ Application::Application()
 	}
 	else
 	{
-		m_mesh[0] = new Mesh(ANIMPATH"testIdle.amesh");
-		m_mesh[1] = new Mesh(ANIMPATH"testWalk.amesh");
+		m_mesh[0] = new Mesh(ANIMPATH"ExoIdle.amesh");
+		m_mesh[1] = new Mesh(ANIMPATH"ExoWalk.amesh");
 
 		m_object = new Object("meshes/example.meshes");
 
@@ -85,24 +85,6 @@ void Application::draw()
 	glm::mat4x4 MV = V * model;
 	MVP = P * MV;
 
-	//// bind the program
-	//m_program->bind();
-	//// shader unifroms
-	//m_program->uniform_Matrix4("mvp", 1, false, MVP);
-	//m_program->uniform_Matrix4("mv", 1, false, MV);
-	//	// draw the Trajectory joint
-	//	//m_mesh[m_currentState]->draw(0);
-	//	//m_mesh[m_currentState]->drawObject();
-	//	for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh[m_currentState]->numberOfFrames(); i += m_mesh[m_currentState]->numberOfFrames())
-	//	{
-	//		//m_mesh[m_currentState]->draw(i);
-	//		//m_mesh[m_currentState]->drawObject(i);
-	//	}
-	//// unbind program and texture
-	//m_program->unbind();
-
-
-
 	// bind program
 	m_objects->bind();
 		//bind texture
@@ -117,12 +99,9 @@ void Application::draw()
 		m_objects->uniform_4f("specular", 0.5f, 0.5f, 0.55f, 1.0f);
 
 		m_mesh[m_currentState]->drawObject();
-		for (size_t i = m_currentFrame; i < m_currentFrame * m_mesh[m_currentState]->numberOfFrames(); i += m_mesh[m_currentState]->numberOfFrames())
-			m_mesh[m_currentState]->drawObject(i);
-
 
 		// recompute MV/MVP matrix
-		MV = V * m_object->matrix();;
+		MV = V * m_object->matrix();
 		MVP = P * MV;
 
 		// set shader uniforms
@@ -156,7 +135,7 @@ void Application::update(float dt)
 
 	m_controller.update(dt);
 
-	if (fabs(m_controller.getRightStick().x) > 0.75f)
+	if (fabs(m_controller.getRightStick().y) > 0.0f)
 	{
 		// change state and update next animation cycle trajectory poisiton
 		m_currentState = Walk;
@@ -205,6 +184,8 @@ void Application::update(float dt)
 	mVector.x = m_trajectoryJoint[3].x;
 	mVector.y = m_trajectoryJoint[3].y;
 	mVector.z = m_trajectoryJoint[3].z;
+
+	std::cout << mVector.x << " " << mVector.y << " " << mVector.z << std::endl;
 	
 	m_camera->update(dt, m_events, m_controller, mVector);
 
