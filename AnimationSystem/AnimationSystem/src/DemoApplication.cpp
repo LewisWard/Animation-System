@@ -180,14 +180,8 @@ void Application::update(float dt)
 	
 	// get the Trajectory joint position
 	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
-	glm::vec3 mVector;
-	mVector.x = m_trajectoryJoint[3].x;
-	mVector.y = m_trajectoryJoint[3].y;
-	mVector.z = m_trajectoryJoint[3].z;
-
-	std::cout << mVector.x << " " << mVector.y << " " << mVector.z << std::endl;
 	
-	m_camera->update(dt, m_events, m_controller, mVector);
+	m_camera->update(dt, m_events, m_controller, m_trajectoryJoint);
 
 	// go to the next frame
 	m_currentFrame += dt * NUM_OF_FRAMES;

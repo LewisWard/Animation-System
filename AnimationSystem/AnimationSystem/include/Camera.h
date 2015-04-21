@@ -21,18 +21,12 @@ public:
 	/// \prama Event event handler
 	void update(float dt, Event& events);
 
-	/// \brief update the camera (supports Xbox Controller + Mouse/Keyboard)
-	/// \prama float delta time
-	/// \prama Event event handler
-	/// \prama XboxController Xbox controller
-	void update(float dt, Event& events, XboxController& controller);
-
 	/// \brief update the camera (follow target)
 	/// \prama float delta time
 	/// \prama Event event handler
 	/// \prama XboxController Xbox controller
 	/// \prama glm::vec3 trajectory joint
-	void update(float dt, Event& events, XboxController& controller, glm::vec3& trajectoryPosition);
+	void update(float dt, Event& events, XboxController& controller, glm::mat4& trajectoryPosition);
 
 	/// \brief get the model matrix
 	/// \prama glm::mat4 model matrix
@@ -63,9 +57,6 @@ private:
 	float m_hAngle; ///< the horizontal angle of the camera 
 	float m_vAngle; ///< the vertical angle of the camera 
 	float m_distance; ///< the distance from the target/origin
-
-	int m_lastX;
-	int m_lastY;
 
 	glm::vec3 m_position; ///< camera position
 	glm::vec3 m_dirX; ///< for working out the 'up' direction of the camera
