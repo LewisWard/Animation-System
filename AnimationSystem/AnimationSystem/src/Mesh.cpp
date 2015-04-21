@@ -362,21 +362,23 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 	newDirection = newDirection * m_facing;
 	translation = newDirection;
 
+	float stickMovement = rStick.x + rStick.y;
+
+	if (stickMovement > 1.0f)
+		stickMovement = 1.0f;
+
 	// invert the X 
-	translation.x = -translation.x;
 	translation.z = -translation.z;
-	translation *= rStick.y * 5.5f * dt;
+	translation *= stickMovement* 10.5f * dt;
 
 	// move
 	position += translation;
 	m_modelMatrix = glm::translate(position);
 
 	// apply rotation
-	m_hAngle += -rStick.x * 5.0f * dt;
+	m_hAngle += -rStick.x * 35.0f * dt;
 	m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
 	m_facing = glm::quat_cast(m_modelMatrix);
-
-	std::cout << m_modelMatrix[3].x << " " << m_modelMatrix[3].y << " " << m_modelMatrix[3].z << std::endl;
 
 	// cycle all joint clusters
 	for (int j = 0; j < m_jointCluster.size(); ++j)

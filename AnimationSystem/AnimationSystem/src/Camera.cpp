@@ -5,9 +5,9 @@
 
 Camera::Camera(float windowW, float windowH)
 {
-	m_hAngle = 180.0f;
+	m_hAngle = 0.0f;
 	m_vAngle = 25.0f;
-	m_distance = -75.0f;
+	m_distance = 75.0f;
 
 	m_position = glm::vec3(0.0f, 50.0f, m_distance);
 	m_dirX = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -46,23 +46,11 @@ void Camera::update(float dt, Event& events, XboxController& controller, glm::ma
 	glm::vec2 lStick = controller.getLeftStick();
 	glm::vec2 rStick = controller.getRightStick();
 
-	///// ------------------------- Mouse & Keybaord -------------------------/////
-	//// apply zoom
-	//m_position.z = trajectoryPosition.z + m_distance;
-	//m_view = glm::translate(glm::mat4(1.0f), m_position);
-	//
-	//// apply rotation
-	//m_view = glm::rotate(m_view, glm::radians(m_vAngle), m_dirX); // vertical
-	//m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
-
 	///// ------------------------- Xbox Controller -------------------------/////
-	//m_position.x = trajectoryPosition.x;
-	//m_position.y = trajectoryPosition.y - 50.0f;
-	//m_position.z = fabs(trajectoryPosition.z) + m_distance; // apply zoom
-
-	//m_position.x = trajectoryPosition.x;
-	//m_position.y = trajectoryPosition.y;
-	//m_position.z = trajectoryPosition.z + m_distance; // apply zoom
+	// update camera position
+	m_position.x = trajectoryPosition[3].x;
+	m_position.y = trajectoryPosition[3].y;
+	m_position.z = trajectoryPosition[3].z; // apply zoom
 
 	// compute zoom
 	if (controller.getLeftTrigger())
@@ -70,27 +58,28 @@ void Camera::update(float dt, Event& events, XboxController& controller, glm::ma
 	else if (controller.getRightTrigger())
 		m_distance -= controller.getRightTrigger();
 
-	// invert 
-	//m_position.x = -m_position.x;
-	
-	std::cout << trajectoryPosition[3].x << " " << trajectoryPosition[3].y << " " << trajectoryPosition[3].z << std::endl;
-	//std::cout << "tra :" << trajectory[3].x << " " << trajectory[3].y << " " << trajectory[3].z << std::endl;
-	//std::cout << m_view[3].x << " " << m_view[3].y << " " << m_view[3].z << std::endl;
-	
 	// apply rotation
 	m_vAngle += lStick.y;
 	m_hAngle += -lStick.x;
 
-	m_model[3].x = trajectoryPosition[3].x;
-	m_model[3].y = trajectoryPosition[3].y + m_position.y;
-	m_model[3].z = trajectoryPosition[3].z + m_distance; // apply zoom
-	
-	//m_view = glm::inverse(glm::rotate(m_model, glm::radians(m_vAngle), m_dirX)); // vertical
-	m_view = glm::inverse(glm::rotate(m_model, glm::radians(m_hAngle), m_dirY)); // horizontal
+	m_model = trajectoryPosition;
 
-	std::cout << "pos :" << m_hAngle << " " << m_vAngle << " " << m_distance << std::endl;
-	//std::cout << "rot :" << rotated.x << " " << rotated.y << " " << rotated.z << std::endl;
-	std::cout << "vie :" << m_view[3].x << " " << m_view[3].y << " " << m_view[3].z << std::endl;
+	glm::vec3 offset(0, 25, m_distance);
+
+	m_model[3].x = trajectoryPosition[3].x;
+	m_model[3].y = trajectoryPosition[3].y;// + 50.0f;
+	m_model[3].z = trajectoryPosition[3].z;// + m_distance; // apply 
+	
+	glm::mat4 viewV = glm::rotate(m_model, glm::radians(m_vAngle), m_dirX); // vertical
+	glm::mat4 viewH = glm::rotate(viewV, glm::radians(m_hAngle), m_dirY); // horizontal
+
+	// get final view matrix
+	m_view = glm::inverse(glm::translate(viewH, offset));
+
+	std::cout << "traj  :" << trajectoryPosition[3].x << " " << trajectoryPosition[3].y << " " << trajectoryPosition[3].z << std::endl;
+	std::cout << "quat  :" << offset.x << " " << offset.y << " " << offset.z << std::endl;
+	std::cout << "model :" << m_model[3].x << " " << m_model[3].y << " " << m_model[3].z << std::endl;
+	std::cout << "view  :" << m_view[3].x << " " << m_view[3].y << " " << m_view[3].z << std::endl;
 }
 void Camera::verticalMove(float dt, int difference)
 {
