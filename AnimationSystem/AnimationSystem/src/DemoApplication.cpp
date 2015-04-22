@@ -10,6 +10,12 @@ Application::Application()
 	m_eventCode = 0;
 	m_currentState = Idle;
 
+	 m_movement = new bool[3]{
+		false, // forward 
+		false, // moveLeft
+		false  // moveRight
+	};
+
 	// setup GLEW, if falis quit application
 	if (!initGLEW())
 	{
@@ -63,6 +69,7 @@ Application::~Application()
 	m_program = nullptr;
 	m_objects = nullptr;
 
+	delete[] m_movement;
 	delete[] m_mesh;
 	delete m_object;
 	m_object = nullptr;
@@ -134,9 +141,11 @@ void Application::update(float dt)
 	// get lastest event 
 	m_eventCode = m_events.update();
 
+	// update keybaord and Xbox controller
+	keybaordMovementUpdate();
 	m_controller.update(dt);
 
-	if (fabs(m_controller.getRightStick().y) > 0.0f)
+	if (fabs(m_controller.getRightStick().y) > 0.0f || m_movement[0] || m_movement[1] || m_movement[2])
 	{
 		// change state and update next animation cycle trajectory poisiton
 		m_currentState = Walk;
@@ -177,12 +186,12 @@ void Application::update(float dt)
 		}
 	#endif
 
-	m_mesh[m_currentState]->update(dt, m_currentFrame, m_events, m_controller);
+	m_mesh[m_currentState]->update(dt, m_currentFrame, m_events, m_movement, m_controller);
 	
 	// get the Trajectory joint position
 	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
 
-	std::cout << m_currentState << " " << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
+	//std::cout << m_currentState << " " << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
 	
 	m_camera->update(dt, m_events, m_controller, m_trajectoryJoint);
 
@@ -192,4 +201,38 @@ void Application::update(float dt)
 	// reset the frame
 	if (m_currentFrame > NUM_OF_FRAMES)
 		m_currentFrame = 0.0f;
+}
+void Application::keybaordMovementUpdate()
+{
+		if (m_eventCode == kWdown)
+		{
+			m_movement[0] = true;
+			std::cout << "kWdown move: true "<< std::endl;
+		}
+		else if (m_eventCode == kWUp)
+		{
+			m_movement[0] = false;
+			std::cout << "kWUp move: false " << std::endl;
+		}
+
+		if (m_eventCode == kAdown)
+		{
+			m_movement[1] = true;
+			std::cout << "kAdown move: true " << std::endl;
+		}
+		else if (m_eventCode == kAUp)
+		{
+			m_movement[1] = false;
+			std::cout << "kAUp move: false " << std::endl;
+		}
+		else if (m_eventCode == kDdown)
+		{
+			m_movement[2] = true;
+			std::cout << "kDdown move: true " << std::endl;
+		}
+		else if (m_eventCode == kDUp)
+		{
+			m_movement[2] = false;
+			std::cout << "kDUp move: false " << std::endl;
+		}
 }

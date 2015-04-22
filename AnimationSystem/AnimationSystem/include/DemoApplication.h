@@ -56,6 +56,10 @@ public:
 	{ return m_events.playState(); }
 
 private:
+
+	void keybaordMovementUpdate();
+
+
 	Window m_window; ///< demo window
 	Event m_events;  ///< demo user input events
 	Mesh* m_mesh[ANIMCOUNT];
@@ -70,4 +74,5 @@ private:
 	Object* m_object;
 	Texture* m_texture;
 	Texture* m_exoTexture;
+	bool* m_movement;
 };

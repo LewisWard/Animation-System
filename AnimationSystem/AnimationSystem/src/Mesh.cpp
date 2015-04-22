@@ -342,10 +342,9 @@ Mesh::~Mesh()
 	glDeleteBuffers(1, &m_vboMesh);
 	glDeleteBuffers(1, &m_iboMesh);
 }
-void Mesh::update(float dt, float frame, Event& events, XboxController& controller)
+void Mesh::update(float dt, float frame, Event& events, bool movement[], XboxController& controller)
 {
 	// get lastest event 
-	int eventCode = events.update();
 	glm::vec2 mouse = events.mouseUpdate();
 	glm::vec2 lStick = controller.getLeftStick();
 	glm::vec2 rStick = controller.getRightStick();
@@ -367,18 +366,36 @@ void Mesh::update(float dt, float frame, Event& events, XboxController& controll
 	if (stickMovement > 1.0f)
 		stickMovement = 1.0f;
 
+	// handles keyboard input 
+	if (movement[0])
+		stickMovement = 1.0f;
+
 	// invert the X 
 	translation.z = -translation.z;
-	translation *= stickMovement* 10.5f * dt;
+	translation *= stickMovement * 10.5f * dt;
 
 	// move
 	position += translation;
 	m_modelMatrix = glm::translate(position);
 
-	// apply rotation
+	// apply rotation with controller
 	m_hAngle += -rStick.x * 35.0f * dt;
 	m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
 	m_facing = glm::quat_cast(m_modelMatrix);
+
+	// apply rotation with keyboard
+	if (movement[1])
+	{
+		m_hAngle += 1.0f * 35.0f * dt;
+		m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
+		m_facing = glm::quat_cast(m_modelMatrix);
+	}
+	else if (movement[2])
+	{
+		m_hAngle += -1.0f * 35.0f * dt;
+		m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
+		m_facing = glm::quat_cast(m_modelMatrix);
+	}
 
 	// cycle all joint clusters
 	for (int j = 0; j < m_jointCluster.size(); ++j)

@@ -10,7 +10,8 @@
 enum events
 {
 	kNONE, ///< nothing pressed
-	kSpace, ///< Space bar 
+	kSpace, kSpaceUp, ///< Space bar 
+	kWdown, kSdown, kAdown, kDdown, kWUp, kSUp, kAUp, kDUp, ///< W/A/S/D
 	kMDL, kMDM, kMDR, ///< Mouse Down Left/Middle/Right
 	kCtrl, kAlt ///< left control / left Alt
 };

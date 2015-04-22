@@ -22,8 +22,16 @@ int Event::update()
 		case SDL_WINDOWEVENT:
 			break;
 		case SDL_KEYDOWN:
+				if (SDLK_w == m_event.key.keysym.sym)
+				{ return kWdown; }
+				else if (SDLK_s == m_event.key.keysym.sym)
+				{ return kSdown; }
+				if (SDLK_a == m_event.key.keysym.sym)
+				{	return kAdown; }
+				else if(SDLK_d == m_event.key.keysym.sym)
+				{ return kDdown; }
 				if(SDLK_SPACE == m_event.key.keysym.sym)
-				{return kSpace;}
+				{ return kSpace; }
 				if (SDLK_LCTRL == m_event.key.keysym.sym)
 				{ return kCtrl; }
 				if (SDLK_LALT == m_event.key.keysym.sym)
@@ -32,6 +40,16 @@ int Event::update()
 				return kNONE;
 			break;
 		case SDL_KEYUP:
+			if (SDLK_w == m_event.key.keysym.sym)
+			{ return kWUp; }
+			else if (SDLK_s == m_event.key.keysym.sym)
+			{ return kSUp; }
+			if (SDLK_a == m_event.key.keysym.sym)
+			{ return kAUp; }
+			else if (SDLK_d == m_event.key.keysym.sym)
+			{ return kDUp; }
+			if (SDLK_SPACE == m_event.key.keysym.sym)
+			{ return kSpaceUp; }
 			break;
 		case SDL_MOUSEMOTION:
 			// update mouse position

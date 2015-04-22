@@ -69,7 +69,7 @@ public:
 	/// \brief  dtor
 	~Mesh();
 
-	void update(float dt, float frame, Event& events, XboxController& controller);
+	void update(float dt, float frame, Event& events, bool movement[], XboxController& controller);
 
 	void draw();
 
