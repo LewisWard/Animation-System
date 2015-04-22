@@ -58,46 +58,38 @@ void XboxController::update(float dt)
 		if (m_state.Gamepad.bLeftTrigger)
 		{
 			m_leftTrigger = LTrigger;
-			std::cout << "bLeftTrigger" << std::endl;
 		}
 		if (m_state.Gamepad.bRightTrigger)
 		{
 			m_rightTrigger = RTrigger;
-			std::cout << "bRightTrigger" << std::endl;
 		}
 
 		// A/B/X/Y buttons
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
 		{
 			m_buttonPressed = kA;
-			std::cout << "XINPUT_GAMEPAD_A" << std::endl;
 		}
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
 		{
 			m_buttonPressed = kB;
-			std::cout << "XINPUT_GAMEPAD_B" << std::endl;
 		}
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
 		{
 			m_buttonPressed = kX;
-			std::cout << "XINPUT_GAMEPAD_X" << std::endl;
 		}
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
 		{
 			m_buttonPressed = kY;
-			std::cout << "XINPUT_GAMEPAD_Y" << std::endl;
 		}
 
 		// shoulder buttons
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 		{
 			m_buttonPressed = kLS;
-			std::cout << "XINPUT_GAMEPAD_LEFT_SHOULDER" << std::endl;
 		}
 		if (m_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 		{
 			m_buttonPressed = kRS;
-			std::cout << "XINPUT_GAMEPAD_RIGHT_SHOULDER" << std::endl;
 		}
 
 		// deadzone and the sticks values

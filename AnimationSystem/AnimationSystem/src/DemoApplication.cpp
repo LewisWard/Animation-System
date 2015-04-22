@@ -26,19 +26,19 @@ Application::Application()
 		m_mesh[0] = new Mesh(ANIMPATH"ExoIdle.amesh");
 		m_mesh[1] = new Mesh(ANIMPATH"ExoWalk.amesh");
 
-		m_object = new Object("meshes/example.meshes");
+		m_object = new Object("meshes/Building_Shop.meshes");
 
 		m_texture = new Texture("images/example.png");
 		m_exoTexture = new Texture("images/Exo.png");
 
 		// scale and rotate the object
 		glm::mat4 scale;
-		scale[0].x = 2;
-		scale[1].y = 2;
-		scale[2].z = 2;
+		scale[0].x = 4;
+		scale[1].y = 4;
+		scale[2].z = 4;
 		m_object->scale(scale);
 		m_object->rotate(0.0f, -90.0f);
-		m_object->translate(glm::vec3(10.0f, 0.0f, 2.0f));
+		m_object->translate(glm::vec3(10.0f, 0.0f, -45.0f));
 
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
@@ -145,17 +145,29 @@ void Application::update(float dt)
 	keybaordMovementUpdate();
 	m_controller.update(dt);
 
+	animCycle lastState = m_currentState;
+
 	if (fabs(m_controller.getRightStick().y) > 0.0f || m_movement[0] || m_movement[1] || m_movement[2])
 	{
 		// change state and update next animation cycle trajectory poisiton
 		m_currentState = Walk;
 		m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
+
 	}
 	else
 	{
 		// change state and update next animation cycle trajectory poisiton
 		m_currentState = Idle;
 		m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
+	}
+
+	// if the state has changed update the direction the mech is facing for other state
+	if(lastState != m_currentState)
+	{
+		if (m_currentState == Walk)
+			m_mesh[Walk]->hAngle(m_mesh[Idle]->getHAngle());
+		else
+			m_mesh[Idle]->hAngle(m_mesh[Walk]->getHAngle());
 	}
 
 	// Debug builds only
@@ -207,32 +219,44 @@ void Application::keybaordMovementUpdate()
 		if (m_eventCode == kWdown)
 		{
 			m_movement[0] = true;
-			std::cout << "kWdown move: true "<< std::endl;
+			#ifdef _DEBUG 
+				std::cout << "kWdown move: true "<< std::endl; 
+			#endif
 		}
 		else if (m_eventCode == kWUp)
 		{
 			m_movement[0] = false;
-			std::cout << "kWUp move: false " << std::endl;
+			#ifdef _DEBUG 
+				std::cout << "kWUp move: false " << std::endl;
+			#endif
 		}
 
 		if (m_eventCode == kAdown)
 		{
 			m_movement[1] = true;
-			std::cout << "kAdown move: true " << std::endl;
+			#ifdef _DEBUG 
+				std::cout << "kAdown move: true " << std::endl;
+			#endif
 		}
 		else if (m_eventCode == kAUp)
 		{
 			m_movement[1] = false;
-			std::cout << "kAUp move: false " << std::endl;
+			#ifdef _DEBUG 
+				std::cout << "kAUp move: false " << std::endl;
+			#endif
 		}
 		else if (m_eventCode == kDdown)
 		{
 			m_movement[2] = true;
-			std::cout << "kDdown move: true " << std::endl;
+			#ifdef _DEBUG 
+				std::cout << "kDdown move: true " << std::endl;
+			#endif
 		}
 		else if (m_eventCode == kDUp)
 		{
 			m_movement[2] = false;
-			std::cout << "kDUp move: false " << std::endl;
+			#ifdef _DEBUG 
+				std::cout << "kDUp move: false " << std::endl;
+			#endif
 		}
 }

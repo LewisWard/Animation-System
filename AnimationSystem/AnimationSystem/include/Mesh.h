@@ -96,6 +96,13 @@ public:
 	inline int numberOfJoints()
 	{ return m_joints; }
 
+	inline float getHAngle()
+	{ return m_hAngle;
+	}
+
+	inline void hAngle(float h)
+	{ m_hAngle = h; }
+
 private:
 	rigidSkinnedMesh m_rMesh;
 	uint32_t m_vbo;

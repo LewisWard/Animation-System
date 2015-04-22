@@ -6,11 +6,8 @@
 	This program will allow for users to export a Maya animation with the custom Maya exporter.
 
 	Feature list:
-		Display animation  cycle.
-		Perform animation  blending between different cycles (i.e walking into jogging and running)
-		Allow user to move camera around the scene.
-		Allow user input to control character animation.
-		Allow input from Xbox Controller.
+		Display animation cycle.
+		Perform animation blending between different cycles (i.e walking into jogging and running)
 
 	Fix list:
 		Maya plugin crash when no Trajectory, and I guess same for Hip, joint is within the scene.
@@ -57,8 +54,8 @@ public:
 
 private:
 
+	/// \brief updates the array of movement key are being pressed
 	void keybaordMovementUpdate();
-
 
 	Window m_window; ///< demo window
 	Event m_events;  ///< demo user input events
