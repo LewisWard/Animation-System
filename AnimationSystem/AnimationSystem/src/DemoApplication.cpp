@@ -10,10 +10,11 @@ Application::Application()
 	m_eventCode = 0;
 	m_currentState = Idle;
 
-	 m_movement = new bool[3]{
+	 m_movement = new bool[4]{
 		false, // forward 
 		false, // moveLeft
-		false  // moveRight
+		false, // moveRight
+		false, // collision detected? 
 	};
 
 	// setup GLEW, if falis quit application
@@ -26,12 +27,19 @@ Application::Application()
 		m_mesh[0] = new Mesh(ANIMPATH"ExoIdle.amesh", "meshes/ExoCollision.meshes");
 		m_mesh[1] = new Mesh(ANIMPATH"ExoWalk.amesh", "meshes/ExoCollision.meshes");
 
-		m_object.resize(2);
+		m_object.resize(6);
 		m_object[0] = new Object("meshes/Building_Shop.meshes", "meshes/Building_ShopCollision.meshes");
 		m_object[1] = new Object("meshes/Floor.meshes", "meshes/Floor.meshes");
+		m_object[2] = new Object("meshes/Building_Big.meshes", "meshes/Building_BigCollision.meshes");
+		m_object[3] = new Object("meshes/Building_SmallHouse.meshes", "meshes/Building_SmallHouseCollision.meshes");
+		m_object[4] = new Object("meshes/Building_Flats.meshes", "meshes/Building_FlatsCollision.meshes");
+		m_object[5] = new Object("meshes/Wall.meshes", "meshes/WallCollision.meshes");
 
 		m_texture = new Texture("images/Floor.png");
 		m_exoTexture = new Texture("images/Exo.png");
+		m_bigTexture = new Texture("images/Big.png");
+		m_shopTexture = new Texture("images/Shop.png");
+		m_houseTexture = new Texture("images/Houses.png");
 
 		// scale and rotate the objects
 		glm::mat4 scale;
@@ -39,12 +47,32 @@ Application::Application()
 		scale[1].y = 5;
 		scale[2].z = 5;
 		m_object[0]->scale(scale);
-		scale[0].x = 15;
-		scale[1].y = 15;
-		scale[2].z = 15;
+		scale[0].x = 105;
+		scale[1].y = 105;
+		scale[2].z = 105;
 		m_object[1]->scale(scale);
+		scale[0].x = 3;
+		scale[1].y = 3;
+		scale[2].z = 3;
+		m_object[2]->scale(scale);
+		scale[0].x = 0.7;
+		scale[1].y = 0.7;
+		scale[2].z = 0.7;
+		m_object[3]->scale(scale);
+		scale[0].x = 5;
+		scale[1].y = 5;
+		scale[2].z = 5;
+		m_object[4]->scale(scale);
+
+
 		//m_object[0]->rotate(0.0f, 90.0f);
-		m_object[0]->translate(glm::vec3(0.0f, 0.0f, -50.0f));
+		m_object[0]->translate(glm::vec3(-75.0f, 0.0f, -50.0f));
+		m_object[1]->translate(glm::vec3(0.0f, 0.0f, 20.0f));
+		m_object[2]->translate(glm::vec3(58.0f, 0.0f, -30.0f));
+		m_object[3]->rotate(0.0f, 180.0f);
+		m_object[3]->translate(glm::vec3(-58.0f, 0.0f, 200.0f));
+		m_object[4]->rotate(0.0f, 180.0f);
+		m_object[4]->translate(glm::vec3(120.0f, 0.0f, 200.0f));
 
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
@@ -70,6 +98,9 @@ Application::~Application()
 {
 	delete m_texture;
 	delete m_exoTexture;
+	delete m_bigTexture;
+	delete m_shopTexture;
+	delete m_houseTexture;
 	delete m_program;
 	delete m_objects;
 	m_program = nullptr;
@@ -110,6 +141,9 @@ void Application::draw()
 		//bind texture
 		m_texture->bind(0);
 		m_exoTexture->bind(1);
+		m_bigTexture->bind(2);
+		m_shopTexture->bind(3);
+		m_houseTexture->bind(4);
 
 		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
@@ -127,24 +161,47 @@ void Application::draw()
 		// set shader uniforms
 		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
-		m_objects->uniform_1i("texture", 0);
+		m_objects->uniform_1i("texture", 3);
 		m_objects->uniform_4f("specular", 0.0f, 0.0f, 0.15f, 1.0f);
 		
 		// draw
 		m_object[0]->draw();
 
-
 		// recompute MV/MVP matrix
 		MV = V * m_object[1]->matrix();
 		MVP = P * MV;
+		m_objects->uniform_1i("texture", 0);
 		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
 		m_object[1]->draw();
+		MV = V * m_object[3]->matrix();
+		MVP = P * MV;
+		m_objects->uniform_1i("texture", 4);
+		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
+		m_objects->uniform_Matrix4("mv", 1, false, MV);
+		m_object[3]->draw();
+		m_object[5]->draw();
+		MV = V * m_object[2]->matrix();
+		MVP = P * MV;
+		m_objects->uniform_1i("texture", 2);
+		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
+		m_objects->uniform_Matrix4("mv", 1, false, MV);
+		m_object[2]->draw();
+		MV = V * m_object[4]->matrix();
+		MVP = P * MV;
+		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
+		m_objects->uniform_Matrix4("mv", 1, false, MV);
+		m_objects->uniform_1i("texture", 3);
+		m_object[4]->draw();
+
 
 
 		// unbind texture
 		m_texture->unbind();
 		m_exoTexture->unbind();
+		m_bigTexture->unbind();
+		m_shopTexture->unbind();
+		m_houseTexture->unbind();
 
 	// unbind program
 	m_objects->unbind();
@@ -224,19 +281,23 @@ void Application::update(float dt)
 		}
 	#endif
 
+	for (int i = 0; i < m_object.size(); ++i)
+	{
+		if (m_object[i]->getAABB().intersect(m_mesh[m_currentState]->getAABB()))
+		{
+			std::cout << "Collision!!\n";
+			m_movement[3] = true;
+		}
+	}
+
 	m_mesh[m_currentState]->update(dt, m_currentFrame, m_events, m_movement, m_controller);
 
 	// get the Trajectory joint position
 	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
 
-	//std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
+	std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
 	
 	m_camera->update(dt, m_events, m_controller, m_trajectoryJoint);
-
-	if (m_object[0]->getAABB().intersect(m_mesh[m_currentState]->getAABB()))
-	{
-		std::cout << "HIT\n";
-	}
 
 	// go to the next frame
 	m_currentFrame += dt * NUM_OF_FRAMES;
@@ -244,6 +305,8 @@ void Application::update(float dt)
 	// reset the frame
 	if (m_currentFrame > NUM_OF_FRAMES)
 		m_currentFrame = 0.0f;
+
+	m_movement[3] = false;
 }
 void Application::keybaordMovementUpdate()
 {

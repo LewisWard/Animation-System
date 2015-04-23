@@ -110,7 +110,7 @@ Window::Window()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	// clear screen to set colour
-	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+	glClearColor(0.28f, 0.63f, 0.78f, 0.0f);
 }
 Window::~Window()
 {

@@ -449,13 +449,11 @@ void Mesh::update(float dt, float frame, Event& events, bool movement[], XboxCon
 	position += translation;
 	m_modelMatrix = glm::translate(position);
 
+
 	// translate the AABB
 	if (movement[1] || movement[2] || stickMovement != 0 && frame > 70)
 	{
 		glm::vec3 vector(m_modelMatrix[3].x, m_modelMatrix[3].y, m_modelMatrix[3].z);
-		std::cout << vector.x << " " << vector.y << " " << vector.z << std::endl;
-		std::cout << m_AABBOrignal.min.x + vector.x << " " << m_AABBOrignal.min.y + vector.y << " " << m_AABBOrignal.min.z + vector.z << std::endl;
-		std::cout << m_AABBOrignal.max.x + vector.x << " " << m_AABBOrignal.max.y + vector.y << " " << m_AABBOrignal.max.z + vector.z << std::endl;
 		m_AABB = AABB3((m_AABBOrignal.min + vector), (m_AABBOrignal.max + vector));
 	}
 

@@ -71,5 +71,8 @@ private:
 	std::vector<Object*> m_object;
 	Texture* m_texture;
 	Texture* m_exoTexture;
+	Texture* m_bigTexture;
+	Texture* m_shopTexture;
+	Texture* m_houseTexture;
 	bool* m_movement;
 };
