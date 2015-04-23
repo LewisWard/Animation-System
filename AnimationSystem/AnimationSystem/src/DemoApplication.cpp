@@ -327,7 +327,6 @@ void Application::draw()
 		m_program->unbind();
 	}
 	
-	
 	// draw main menu
 	if (m_state == 0)
 	{
@@ -347,8 +346,6 @@ void Application::draw()
 			m_mainMenuTexture->unbind();
 		m_menuProgram->unbind();
 	}
-
-	
 
 	// disable OpenGL textures and depth testing
 	glDisable(GL_TEXTURE_2D);
@@ -390,8 +387,6 @@ void Application::update(float dt)
 	}
 	else
 	{
-		std::cout << m_movement[0] << " " << m_movement[1] << " " << m_movement[4] << " " << m_movement[5] << std::endl;
-
 		animCycle lastState = m_currentState;
 
 		if (fabs(m_controller.getRightStick().y) > 0.0f || m_movement[0] || m_movement[1] || m_movement[2])
@@ -423,32 +418,18 @@ void Application::update(float dt)
 		}
 
 		// Debug builds only
-#ifdef _DEBUG
-		// turn on fill
-		if (m_controller.getLastButtonPressed() == kX || m_eventCode == kCtrl) // X (Xbox controller) or Left Crtl for fill mode
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		}
-		// turn on wirefire
-		if (m_controller.getLastButtonPressed() == kY || m_eventCode == kAlt) // Y (Xbox controller) or Left Alt for wireframe mode
-		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		}
-
-		if (m_controller.getLastButtonPressed() == kA)
-		{
-			// change state and update next animation cycle trajectory poisiton
-			m_currentState = Walk;
-			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
-
-		}
-		else 	if (m_controller.getLastButtonPressed() == kB)
-		{
-			// change state and update next animation cycle trajectory poisiton
-			m_currentState = Idle;
-			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
-		}
-#endif
+		#ifdef _DEBUG
+			// turn on fill
+			if (m_controller.getLastButtonPressed() == kX || m_eventCode == kCtrl) // X (Xbox controller) or Left Crtl for fill mode
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			// turn on wirefire
+			if (m_controller.getLastButtonPressed() == kY || m_eventCode == kAlt) // Y (Xbox controller) or Left Alt for wireframe mode
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+		#endif
 
 		for (int i = 0; i < m_object.size(); ++i)
 		{
@@ -459,14 +440,13 @@ void Application::update(float dt)
 			}
 		}
 
+		// update the animation
 		m_mesh[m_currentState]->update(dt, m_currentFrame, m_events, m_movement, m_controller);
 
 		// get the Trajectory joint position
 		m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
 
-		//std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
-		std::cout << m_mesh[0]->getHAngle() << " " << m_mesh[1]->getHAngle() << std::endl;
-
+		// update the camera
 		m_camera->update(dt, m_events, m_movement, m_controller, m_trajectoryJoint);
 
 		// go to the next frame

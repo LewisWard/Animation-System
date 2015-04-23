@@ -441,14 +441,22 @@ void Mesh::update(float dt, float frame, Event& events, bool movement[], XboxCon
 	if (movement[0])
 		stickMovement = 1.0f;
 
-	// invert the X 
-	translation.z = -translation.z;
+	// if collision is detected make the skeleton walk backwards
+	if (movement[3])
+	{
+		translation = -translation;
+	}
+	else
+	{
+		// invert the X 
+		translation.z = -translation.z;
+	}
+
 	translation *= stickMovement * 12.5f * dt;
 
 	// move
 	position += translation;
 	m_modelMatrix = glm::translate(position);
-
 
 	// translate the AABB
 	if (movement[1] || movement[2] || stickMovement != 0 && frame > 70)
