@@ -443,7 +443,7 @@ void Mesh::update(float dt, float frame, Event& events, bool movement[], XboxCon
 
 	// invert the X 
 	translation.z = -translation.z;
-	translation *= stickMovement * 10.5f * dt;
+	translation *= stickMovement * 12.5f * dt;
 
 	// move
 	position += translation;
@@ -459,22 +459,21 @@ void Mesh::update(float dt, float frame, Event& events, bool movement[], XboxCon
 
 	// apply rotation with controller
 	m_hAngle += -rStick.x * 35.0f * dt;
-	m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
-	m_facing = glm::quat_cast(m_modelMatrix);
 
 	// apply rotation with keyboard
 	if (movement[1])
 	{
 		m_hAngle += 1.0f * 35.0f * dt;
-		m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
-		m_facing = glm::quat_cast(m_modelMatrix);
 	}
-	else if (movement[2])
+  if (movement[2])
 	{
 		m_hAngle += -1.0f * 35.0f * dt;
-		m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
-		m_facing = glm::quat_cast(m_modelMatrix);
 	}
+
+	// compute rotation
+	m_modelMatrix = glm::rotate(m_modelMatrix, glm::radians(m_hAngle), m_dirY);
+	m_facing = glm::quat_cast(m_modelMatrix);
+
 
 	// cycle all joint clusters
 	for (int j = 0; j < m_jointCluster.size(); ++j)

@@ -93,6 +93,7 @@ Application::Application()
 		m_object[3]->translate(glm::vec3(-58.0f, 0.0f, 200.0f));
 		m_object[4]->rotate(0.0f, 180.0f);
 		m_object[4]->translate(glm::vec3(225.0f, 0.0f, 200.0f));
+		m_object[5]->rotate(0.0f, 180.0f);
 		m_object[5]->translate(glm::vec3(0.0f, 0.0f, 270.0f));
 		m_object[6]->translate(glm::vec3(0.0f, 0.0f, -200.0f));
 		m_object[7]->translate(glm::vec3(-250.0f, 0.0f, 40.0f));
@@ -132,9 +133,20 @@ Application::~Application()
 	delete m_objects;
 	m_program = nullptr;
 	m_objects = nullptr;
-
+	m_texture = nullptr;
+	m_exoTexture = nullptr;
+	m_bigTexture = nullptr;
+	m_shopTexture = nullptr;
+	m_houseTexture = nullptr;
+	m_wallTexture = nullptr;
+	
 	delete[] m_movement;
-	delete[] m_mesh;
+	m_movement = nullptr;
+
+	m_mesh[0]->~Mesh();
+	m_mesh[1]->~Mesh();
+	delete m_mesh[0];
+	delete m_mesh[1];
 
 	for (int i = 0; i < m_object.size(); ++i)
 	{
@@ -142,7 +154,13 @@ Application::~Application()
 		m_object[i] = nullptr;
 	}
 
+	m_camera->~Camera();
+	m_camera.~shared_ptr();
+	m_camera = nullptr;
+
 	m_object.clear();
+	m_window.~Window();
+
 }
 void Application::draw()
 {
@@ -294,6 +312,8 @@ void Application::update(float dt)
 	keybaordMovementUpdate();
 	m_controller.update(dt);
 
+	std::cout << m_movement[0] << " " << m_movement[1] << " " << m_movement[2] << " " << m_movement[3] << std::endl;
+
 	animCycle lastState = m_currentState;
 
 	if (fabs(m_controller.getRightStick().y) > 0.0f || m_movement[0] || m_movement[1] || m_movement[2])
@@ -366,7 +386,8 @@ void Application::update(float dt)
 	// get the Trajectory joint position
 	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
 
-	std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
+	//std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
+	std::cout << m_mesh[0]->getHAngle() << " " << m_mesh[1]->getHAngle() << std::endl;
 	
 	m_camera->update(dt, m_events, m_controller, m_trajectoryJoint);
 

@@ -22,6 +22,8 @@ int Event::update()
 		case SDL_WINDOWEVENT:
 			break;
 		case SDL_KEYDOWN:
+				if (SDLK_ESCAPE == m_event.key.keysym.sym)
+				{ m_playState = false; } ///< quit window/program
 				if (SDLK_w == m_event.key.keysym.sym)
 				{ return kWdown; }
 				else if (SDLK_s == m_event.key.keysym.sym)

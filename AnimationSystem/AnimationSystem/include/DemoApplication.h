@@ -4,17 +4,13 @@
 
 /*
 	This program will allow for users to export a Maya animation with the custom Maya exporter.
-
-	Feature list:
-		Display animation cycle.
-		Perform animation blending between different cycles (i.e walking into jogging and running)
-
-	Fix list:
-		Maya plugin crash when no Trajectory, and I guess same for Hip, joint is within the scene.
+	Maya plugin crash when no Trajectory or Hip joint is within the scene.
+	!IT IS HIGHLY RECOMMENDED to use a XBOX 360 CONTROLLER for moving around the scene!
 */
 
 #pragma once
 #include "Mesh.h"
+#include "Menu.h"
 #include "Object.h"
 #include "Camera.h"
 #include "gl/Program.h"
@@ -76,4 +72,5 @@ private:
 	Texture* m_houseTexture;
 	Texture* m_wallTexture;
 	bool* m_movement;
+	Menu m_menu;
 };

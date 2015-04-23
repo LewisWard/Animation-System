@@ -5,7 +5,7 @@
 
 Camera::Camera(float windowW, float windowH)
 {
-	m_hAngle = 0.0f;
+	m_hAngle = 180.0f;
 	m_vAngle = 25.0f;
 	m_distance = 75.0f;
 
