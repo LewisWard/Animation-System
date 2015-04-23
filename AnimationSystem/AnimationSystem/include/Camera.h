@@ -24,9 +24,10 @@ public:
 	/// \brief update the camera (follow target)
 	/// \prama float delta time
 	/// \prama Event event handler
+	/// \prama bool array of which keys are being pressed
 	/// \prama XboxController Xbox controller
 	/// \prama glm::vec3 trajectory joint
-	void update(float dt, Event& events, XboxController& controller, glm::mat4& trajectoryPosition);
+	void update(float dt, Event& events, bool movement[], XboxController& controller, glm::mat4& trajectoryPosition);
 
 	/// \brief get the model matrix
 	/// \prama glm::mat4 model matrix

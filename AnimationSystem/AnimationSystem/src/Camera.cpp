@@ -38,10 +38,9 @@ void Camera::update(float dt, Event& events)
 	m_view = glm::rotate(m_view, glm::radians(m_vAngle), m_dirX); // vertical
 	m_view = glm::rotate(m_view, glm::radians(m_hAngle), m_dirY); // horizontal
 }
-void Camera::update(float dt, Event& events, XboxController& controller, glm::mat4& trajectoryPosition)
+void Camera::update(float dt, Event& events, bool movement[], XboxController& controller, glm::mat4& trajectoryPosition)
 {
 	// get lastest event 
-	int eventCode = events.update();
 	glm::vec2 mouse = events.mouseUpdate();
 	glm::vec2 lStick = controller.getLeftStick();
 	glm::vec2 rStick = controller.getRightStick();
@@ -58,9 +57,21 @@ void Camera::update(float dt, Event& events, XboxController& controller, glm::ma
 	else if (controller.getRightTrigger())
 		m_distance -= controller.getRightTrigger();
 
+	// compute zoom with mouse
+	if (movement[6])
+		m_distance += 5.0f;
+	else if (movement[7])
+		m_distance -= 5.0f;
+
 	// apply rotation
 	m_vAngle += lStick.y;
 	m_hAngle += -lStick.x;
+
+	// if Q/E keys used
+	if (movement[4])
+		m_hAngle += 1.0f;
+	if (movement[5])
+		m_hAngle += -1.0f;
 
 	m_model = trajectoryPosition;
 

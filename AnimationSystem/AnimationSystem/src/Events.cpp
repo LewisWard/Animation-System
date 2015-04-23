@@ -32,6 +32,10 @@ int Event::update()
 				{	return kAdown; }
 				else if(SDLK_d == m_event.key.keysym.sym)
 				{ return kDdown; }
+				else if (SDLK_q == m_event.key.keysym.sym)
+				{ return kQdown; }
+				else if (SDLK_e == m_event.key.keysym.sym)
+				{ return kEdown; }
 				if(SDLK_SPACE == m_event.key.keysym.sym)
 				{ return kSpace; }
 				if (SDLK_LCTRL == m_event.key.keysym.sym)
@@ -50,6 +54,10 @@ int Event::update()
 			{ return kAUp; }
 			else if (SDLK_d == m_event.key.keysym.sym)
 			{ return kDUp; }
+			else if (SDLK_q == m_event.key.keysym.sym)
+			{ return kQUp; }
+			else if (SDLK_e == m_event.key.keysym.sym)
+			{ return kEUp; }
 			if (SDLK_SPACE == m_event.key.keysym.sym)
 			{ return kSpaceUp; }
 			break;

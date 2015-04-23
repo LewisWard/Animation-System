@@ -8,13 +8,18 @@
 Application::Application()
 {
 	m_eventCode = 0;
+	m_state = 0; // 0 = main menu, 1 = controls, 2 = animation system
 	m_currentState = Idle;
 
-	 m_movement = new bool[4]{
+	 m_movement = new bool[]{
 		false, // forward 
 		false, // moveLeft
 		false, // moveRight
 		false, // collision detected? 
+		false, // rotate camera left
+		false, // rotate camera right
+		false, // zoom camera in
+		false  // zoom camera out
 	};
 
 	// setup GLEW, if falis quit application
@@ -46,6 +51,8 @@ Application::Application()
 		m_shopTexture = new Texture("images/Shop.png");
 		m_houseTexture = new Texture("images/Houses.png");
 		m_wallTexture = new Texture("images/Wall.png");
+		m_mainMenuTexture = new Texture("images/mainMenu.png");
+		m_contMenuTexture = new Texture("images/controllsMenu.png");
 
 		// scale and rotate the objects
 		glm::mat4 scale;
@@ -107,6 +114,7 @@ Application::Application()
 		// shader programs
 		m_program = new gls::Program();
 		m_objects = new gls::Program();
+		m_menuProgram = new gls::Program();
 
 		// create an array of all shaders to load
 		gls::Shader shaders[] = {
@@ -114,15 +122,29 @@ Application::Application()
 			gls::Shader("shaders/wall.pix.glsl", gls::sFRAGMENT), ///< joint fragment shader
 			gls::Shader("shaders/object.vtx.glsl", gls::sVERTEX), ///< object vertex shader
 			gls::Shader("shaders/object.pix.glsl", gls::sFRAGMENT), ///< object fragment shader
+			gls::Shader("shaders/flatImage.vtx.glsl", gls::sVERTEX), ///< flatImage vertex shader
+			gls::Shader("shaders/flatImage.pix.glsl", gls::sFRAGMENT), ///< flatImage fragment shader
 		};
 		
 		// create shader programs
 		m_program->create(&shaders[0], &shaders[1]);
 		m_objects->create(&shaders[2], &shaders[3]);
+		m_menuProgram->create(&shaders[4], &shaders[5]);
+
+		// create menu system
+		m_menu = new Menu();
+
+		// create AABB's for the buttons that resize based on the window size
+		AABB2 start(glm::vec2(30 * (m_window.width() / 512.0f), 381 * (m_window.height() / 512.0f)), glm::vec2(242 * (m_window.width() / 512.0f), 438 * (m_window.height() / 512.0f)));
+		AABB2 controls(glm::vec2(272 * (m_window.width() / 512.0f), 381 * (m_window.height() / 512.0f)), glm::vec2(484 * (m_window.width() / 512.0f), 438 * (m_window.height() / 512.0f)));
+		m_menu->addButton(start);
+		m_menu->addButton(controls);
 	}
 }
 Application::~Application()
 {
+	delete m_mainMenuTexture;
+	delete m_contMenuTexture;
 	delete m_texture;
 	delete m_exoTexture;
 	delete m_bigTexture;
@@ -131,8 +153,14 @@ Application::~Application()
 	delete m_wallTexture;
 	delete m_program;
 	delete m_objects;
+	delete m_menuProgram;
+	delete m_menu;
+	m_menu = nullptr;
+	m_mainMenuTexture = nullptr;
+	m_contMenuTexture = nullptr;
 	m_program = nullptr;
 	m_objects = nullptr;
+	m_menuProgram = nullptr;
 	m_texture = nullptr;
 	m_exoTexture = nullptr;
 	m_bigTexture = nullptr;
@@ -171,18 +199,21 @@ void Application::draw()
 	// clear the colour and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// get the MVP martix
-	glm::mat4x4 MVP;
-	glm::mat4x4 V = m_camera.get()->viewMatrix();
-	glm::mat4x4 P = m_camera.get()->projectionMatrix();
-	glm::mat4 model = m_mesh[m_currentState]->getModelMatrix();
+	// draw animation system
+	if (m_state == 2)
+	{
+		// get the MVP martix
+		glm::mat4x4 MVP;
+		glm::mat4x4 V = m_camera.get()->viewMatrix();
+		glm::mat4x4 P = m_camera.get()->projectionMatrix();
+		glm::mat4 model = m_mesh[m_currentState]->getModelMatrix();
 
-	// compute the Model-View-Project Matrix
-	glm::mat4x4 MV = V * model;
-	MVP = P * MV;
+		// compute the Model-View-Project Matrix
+		glm::mat4x4 MV = V * model;
+		MVP = P * MV;
 
-	// bind program
-	m_objects->bind();
+		// bind program
+		m_objects->bind();
 		// bind textures
 		m_texture->bind(0);
 		m_exoTexture->bind(1);
@@ -247,11 +278,11 @@ void Application::draw()
 		m_houseTexture->unbind();
 		m_wallTexture->unbind();
 
-	// unbind program
-	m_objects->unbind();
+		// unbind program
+		m_objects->unbind();
 
-	// bind program for walls
-	m_program->bind();
+		// bind program for walls
+		m_program->bind();
 
 		// bind textures
 		m_wallTexture->bind(5);
@@ -293,7 +324,30 @@ void Application::draw()
 
 		m_wallTexture->unbind();
 
-	m_program->unbind();
+		m_program->unbind();
+	}
+	
+	
+	// draw main menu
+	if (m_state == 0)
+	{
+		m_menuProgram->bind();
+			m_mainMenuTexture->bind(0);
+			m_menuProgram->uniform_1i("texture", 0);
+			m_menu->draw();
+			m_mainMenuTexture->unbind();
+		m_menuProgram->unbind();
+	}
+	else if (m_state == 1) // draw control menu
+	{
+		m_menuProgram->bind();
+			m_contMenuTexture->bind(0);
+			m_menuProgram->uniform_1i("texture", 0);
+			m_menu->draw();
+			m_mainMenuTexture->unbind();
+		m_menuProgram->unbind();
+	}
+
 	
 
 	// disable OpenGL textures and depth testing
@@ -312,40 +366,64 @@ void Application::update(float dt)
 	keybaordMovementUpdate();
 	m_controller.update(dt);
 
-	std::cout << m_movement[0] << " " << m_movement[1] << " " << m_movement[2] << " " << m_movement[3] << std::endl;
+	if (m_eventCode == kMDL)
+		m_movement[6] = true;
+	if (m_eventCode == kMDR)
+		m_movement[7] = true;
 
-	animCycle lastState = m_currentState;
+	std::cout << m_events.mouseUpdate().x << " " << m_events.mouseUpdate().y << std::endl;
 
-	if (fabs(m_controller.getRightStick().y) > 0.0f || m_movement[0] || m_movement[1] || m_movement[2])
+	// if a menu, update menus others update the animation system
+	if (m_state != 2)
 	{
-		// change state and update next animation cycle trajectory poisiton
-		m_currentState = Walk;
-		m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
+		int result = -1;
+		
+		// if left mose button pressed, has a button been clicked on?
+		if (m_eventCode == kMDL)
+			result = m_menu->buttonClicked(m_events.mouseUpdate());
+
+		// if so which on
+		if (result == 0)
+			m_state = 2;
+		else if (result == 1)
+			m_state = 1;
 	}
 	else
 	{
-		// change state and update next animation cycle trajectory poisiton
-		m_currentState = Idle;
-		m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
-	}
+		std::cout << m_movement[0] << " " << m_movement[1] << " " << m_movement[4] << " " << m_movement[5] << std::endl;
 
-	// if the state has changed update the direction the mech is facing for other state and AABB translation
-	if(lastState != m_currentState)
-	{
-		if (m_currentState == Walk)
+		animCycle lastState = m_currentState;
+
+		if (fabs(m_controller.getRightStick().y) > 0.0f || m_movement[0] || m_movement[1] || m_movement[2])
 		{
-			m_mesh[Walk]->hAngle(m_mesh[Idle]->getHAngle());
-			m_mesh[Walk]->setAABB(m_mesh[Idle]->getAABB());
+			// change state and update next animation cycle trajectory poisiton
+			m_currentState = Walk;
+			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 		}
 		else
 		{
-			m_mesh[Idle]->hAngle(m_mesh[Walk]->getHAngle());
-			m_mesh[Idle]->setAABB(m_mesh[Walk]->getAABB());
+			// change state and update next animation cycle trajectory poisiton
+			m_currentState = Idle;
+			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 		}
-	}
 
-	// Debug builds only
-	#ifdef _DEBUG
+		// if the state has changed update the direction the mech is facing for other state and AABB translation
+		if (lastState != m_currentState)
+		{
+			if (m_currentState == Walk)
+			{
+				m_mesh[Walk]->hAngle(m_mesh[Idle]->getHAngle());
+				m_mesh[Walk]->setAABB(m_mesh[Idle]->getAABB());
+			}
+			else
+			{
+				m_mesh[Idle]->hAngle(m_mesh[Walk]->getHAngle());
+				m_mesh[Idle]->setAABB(m_mesh[Walk]->getAABB());
+			}
+		}
+
+		// Debug builds only
+#ifdef _DEBUG
 		// turn on fill
 		if (m_controller.getLastButtonPressed() == kX || m_eventCode == kCtrl) // X (Xbox controller) or Left Crtl for fill mode
 		{
@@ -362,7 +440,7 @@ void Application::update(float dt)
 			// change state and update next animation cycle trajectory poisiton
 			m_currentState = Walk;
 			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
-	
+
 		}
 		else 	if (m_controller.getLastButtonPressed() == kB)
 		{
@@ -370,79 +448,81 @@ void Application::update(float dt)
 			m_currentState = Idle;
 			m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 		}
-	#endif
+#endif
 
-	for (int i = 0; i < m_object.size(); ++i)
-	{
-		if (m_object[i]->getAABB().intersect(m_mesh[m_currentState]->getAABB()))
+		for (int i = 0; i < m_object.size(); ++i)
 		{
-			std::cout << "Collision!!\n";
-			m_movement[3] = true;
+			if (m_object[i]->getAABB().intersect(m_mesh[m_currentState]->getAABB()))
+			{
+				std::cout << "Collision!!\n";
+				m_movement[3] = true;
+			}
 		}
+
+		m_mesh[m_currentState]->update(dt, m_currentFrame, m_events, m_movement, m_controller);
+
+		// get the Trajectory joint position
+		m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
+
+		//std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
+		std::cout << m_mesh[0]->getHAngle() << " " << m_mesh[1]->getHAngle() << std::endl;
+
+		m_camera->update(dt, m_events, m_movement, m_controller, m_trajectoryJoint);
+
+		// go to the next frame
+		m_currentFrame += dt * NUM_OF_FRAMES;
+
+		// reset the frame
+		if (m_currentFrame > NUM_OF_FRAMES)
+			m_currentFrame = 0.0f;
+
+		m_movement[3] = false;
+		m_movement[6] = false;
+		m_movement[7] = false;
 	}
-
-	m_mesh[m_currentState]->update(dt, m_currentFrame, m_events, m_movement, m_controller);
-
-	// get the Trajectory joint position
-	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
-
-	//std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
-	std::cout << m_mesh[0]->getHAngle() << " " << m_mesh[1]->getHAngle() << std::endl;
-	
-	m_camera->update(dt, m_events, m_controller, m_trajectoryJoint);
-
-	// go to the next frame
-	m_currentFrame += dt * NUM_OF_FRAMES;
-
-	// reset the frame
-	if (m_currentFrame > NUM_OF_FRAMES)
-		m_currentFrame = 0.0f;
-
-	m_movement[3] = false;
 }
 void Application::keybaordMovementUpdate()
 {
 		if (m_eventCode == kWdown)
 		{
 			m_movement[0] = true;
-			#ifdef _DEBUG 
-				std::cout << "kWdown move: true "<< std::endl; 
-			#endif
 		}
 		else if (m_eventCode == kWUp)
 		{
 			m_movement[0] = false;
-			#ifdef _DEBUG 
-				std::cout << "kWUp move: false " << std::endl;
-			#endif
 		}
 
 		if (m_eventCode == kAdown)
 		{
 			m_movement[1] = true;
-			#ifdef _DEBUG 
-				std::cout << "kAdown move: true " << std::endl;
-			#endif
 		}
 		else if (m_eventCode == kAUp)
 		{
 			m_movement[1] = false;
-			#ifdef _DEBUG 
-				std::cout << "kAUp move: false " << std::endl;
-			#endif
 		}
 		else if (m_eventCode == kDdown)
 		{
 			m_movement[2] = true;
-			#ifdef _DEBUG 
-				std::cout << "kDdown move: true " << std::endl;
-			#endif
 		}
 		else if (m_eventCode == kDUp)
 		{
 			m_movement[2] = false;
-			#ifdef _DEBUG 
-				std::cout << "kDUp move: false " << std::endl;
-			#endif
+		}
+
+		if (m_eventCode == kQdown)
+		{
+			m_movement[4] = true;
+		}
+		else if (m_eventCode == kQUp)
+		{
+			m_movement[4] = false;
+		}
+		else if (m_eventCode == kEdown)
+		{
+			m_movement[5] = true;
+		}
+		else if (m_eventCode == kEUp)
+		{
+			m_movement[5] = false;
 		}
 }

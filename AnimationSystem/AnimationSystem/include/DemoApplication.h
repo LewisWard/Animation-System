@@ -60,6 +60,7 @@ private:
 	float m_currentFrame;
 	gls::Program* m_program;
 	gls::Program* m_objects;
+	gls::Program* m_menuProgram;
 	std::shared_ptr<Camera> m_camera;
 	int m_eventCode;
 	XboxController m_controller;
@@ -71,6 +72,9 @@ private:
 	Texture* m_shopTexture;
 	Texture* m_houseTexture;
 	Texture* m_wallTexture;
+	Texture* m_mainMenuTexture;
+	Texture* m_contMenuTexture;
 	bool* m_movement;
-	Menu m_menu;
+	int m_state;
+	Menu* m_menu;
 };
