@@ -38,13 +38,13 @@ Application::Application()
 		scale[0].x = 5;
 		scale[1].y = 5;
 		scale[2].z = 5;
-		//m_object[0]->scale(scale);
+		m_object[0]->scale(scale);
 		scale[0].x = 15;
 		scale[1].y = 15;
 		scale[2].z = 15;
 		m_object[1]->scale(scale);
 		//m_object[0]->rotate(0.0f, 90.0f);
-		//m_object[0]->translate(glm::vec3(10.0f, 0.0f, -45.0f));
+		m_object[0]->translate(glm::vec3(0.0f, 0.0f, -50.0f));
 
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
@@ -181,13 +181,19 @@ void Application::update(float dt)
 		m_mesh[m_currentState]->setModelMatrix(m_trajectoryJoint);
 	}
 
-	// if the state has changed update the direction the mech is facing for other state
+	// if the state has changed update the direction the mech is facing for other state and AABB translation
 	if(lastState != m_currentState)
 	{
 		if (m_currentState == Walk)
+		{
 			m_mesh[Walk]->hAngle(m_mesh[Idle]->getHAngle());
+			m_mesh[Walk]->setAABB(m_mesh[Idle]->getAABB());
+		}
 		else
+		{
 			m_mesh[Idle]->hAngle(m_mesh[Walk]->getHAngle());
+			m_mesh[Idle]->setAABB(m_mesh[Walk]->getAABB());
+		}
 	}
 
 	// Debug builds only
@@ -223,14 +229,9 @@ void Application::update(float dt)
 	// get the Trajectory joint position
 	m_trajectoryJoint = m_mesh[m_currentState]->getModelMatrix();
 
-	std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
+	//std::cout << m_trajectoryJoint[3].x << " " << m_trajectoryJoint[3].y << " " << m_trajectoryJoint[3].z << std::endl;
 	
 	m_camera->update(dt, m_events, m_controller, m_trajectoryJoint);
-
-	glm::vec3 collision;
-	collision.x = m_trajectoryJoint[3].x;
-	collision.y = m_trajectoryJoint[3].y;
-	collision.z = m_trajectoryJoint[3].z;
 
 	if (m_object[0]->getAABB().intersect(m_mesh[m_currentState]->getAABB()))
 	{

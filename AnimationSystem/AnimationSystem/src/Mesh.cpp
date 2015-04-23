@@ -47,7 +47,7 @@
 	 indicesC												///< uint32_t
 */
 
-Mesh::Mesh(const char* rig)
+Mesh::Mesh(const char* rig, const char* collisionFile)
 {
 	m_rMesh.originalMesh = nullptr;
 
@@ -302,35 +302,106 @@ Mesh::Mesh(const char* rig)
 			m_meshDataVertices[i] = indices[i];
 		}
 
-		// genereate a buffer joint data
-		glGenBuffers(1, &m_vbo);
-		glGenBuffers(1, &m_ibo);
-		// bind
-		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormal)*m_rMesh.deformed.size(), &m_rMesh.deformed[0], GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_indices.size(), &m_indices[0], GL_STATIC_DRAW);
-		// unbind
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		// like before read in the data from the file
+		std::ifstream ifsCollision(collisionFile);
+		std::vector<vertNormalUV> collisionData;
 
-		// genereate a buffer for the mesh data
-		glGenBuffers(1, &m_vboMesh);
-		glGenBuffers(1, &m_iboMesh);
-		// bind
-		glBindBuffer(GL_ARRAY_BUFFER, m_vboMesh);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormalUV)*m_rMesh.meshData.size(), &m_rMesh.meshData[0], GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboMesh);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_meshDataVertices.size(), &m_meshDataVertices[0], GL_STATIC_DRAW);
-		// unbind
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		char meshName[100];
+		size_t objectCount, vertexCount, indicesCount;
 
-		std::cout << "LOADED\n";
-	}
-	else
-	{
-		std::cout << "FAILED\n";
+		// if the file is open
+		if (ifsCollision.is_open())
+		{
+			// read in data
+			ifsCollision >> objectCount;
+			ifsCollision >> meshName;
+			ifsCollision >> vertexCount;
+			ifsCollision >> indicesCount;
+
+			// will not need indices data as will not be rendering it, just need to construct AABB from vertex data
+			collisionData.resize(vertexCount);
+			float requiredPadding = 0;
+
+			// read vertex data into vector
+			for (size_t i = 0; i < collisionData.size(); ++i)
+			{
+				ifsCollision >> collisionData[i].V.x >> collisionData[i].V.y >> collisionData[i].V.z // vertex
+					>> collisionData[i].N.x >> collisionData[i].N.y >> collisionData[i].N.z // normal
+					>> requiredPadding >> requiredPadding >> requiredPadding // bi-normal
+					>> requiredPadding >> requiredPadding >> requiredPadding // tangent
+					>> collisionData[i].U.x >> collisionData[i].U.y; // UV
+			}
+
+			// close the file, we are done with it
+			ifsCollision.close();
+
+			float smallestX, smallestY, smallestZ, biggestX, biggestY, biggestZ;
+			smallestX = collisionData[0].V.x;
+			smallestY = collisionData[0].V.y;
+			smallestZ = collisionData[0].V.z;
+			biggestX = collisionData[0].V.x;
+			biggestY = collisionData[0].V.y;
+			biggestZ = collisionData[0].V.z;
+
+			// find the the min and max vertices for the AABB
+			for (size_t i = 1; i < collisionData.size(); ++i)
+			{
+				if (collisionData[i].V.x < smallestX)
+					smallestX = collisionData[i].V.x;
+
+				if (collisionData[i].V.y < smallestY)
+					smallestY = collisionData[i].V.y;
+
+				if (collisionData[i].V.z < smallestZ)
+					smallestZ = collisionData[i].V.z;
+
+				if (collisionData[i].V.x > biggestX)
+					biggestX = collisionData[i].V.x;
+
+				if (collisionData[i].V.y > biggestY)
+					biggestY = collisionData[i].V.y;
+
+				if (collisionData[i].V.z > biggestZ)
+					biggestZ = collisionData[i].V.z;
+			}
+
+			// update the AABB with the new data
+			m_AABB = AABB3(glm::vec3(smallestX, smallestY, smallestZ), glm::vec3(biggestX, biggestY, biggestZ));
+			m_AABBOrignal = m_AABB;
+
+			// clear vector as no longer required
+			collisionData.clear();
+
+			// genereate a buffer joint data
+			glGenBuffers(1, &m_vbo);
+			glGenBuffers(1, &m_ibo);
+			// bind
+			glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormal)*m_rMesh.deformed.size(), &m_rMesh.deformed[0], GL_STATIC_DRAW);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_indices.size(), &m_indices[0], GL_STATIC_DRAW);
+			// unbind
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+			// genereate a buffer for the mesh data
+			glGenBuffers(1, &m_vboMesh);
+			glGenBuffers(1, &m_iboMesh);
+			// bind
+			glBindBuffer(GL_ARRAY_BUFFER, m_vboMesh);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertNormalUV)*m_rMesh.meshData.size(), &m_rMesh.meshData[0], GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboMesh);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int)*m_meshDataVertices.size(), &m_meshDataVertices[0], GL_STATIC_DRAW);
+			// unbind
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+			std::cout << "LOADED\n";
+		}
+		else
+		{
+			std::cout << "FAILED\n";
+		}
 	}
 }
 Mesh::~Mesh()
@@ -377,6 +448,16 @@ void Mesh::update(float dt, float frame, Event& events, bool movement[], XboxCon
 	// move
 	position += translation;
 	m_modelMatrix = glm::translate(position);
+
+	// translate the AABB
+	if (movement[1] || movement[2] || stickMovement != 0 && frame > 70)
+	{
+		glm::vec3 vector(m_modelMatrix[3].x, m_modelMatrix[3].y, m_modelMatrix[3].z);
+		std::cout << vector.x << " " << vector.y << " " << vector.z << std::endl;
+		std::cout << m_AABBOrignal.min.x + vector.x << " " << m_AABBOrignal.min.y + vector.y << " " << m_AABBOrignal.min.z + vector.z << std::endl;
+		std::cout << m_AABBOrignal.max.x + vector.x << " " << m_AABBOrignal.max.y + vector.y << " " << m_AABBOrignal.max.z + vector.z << std::endl;
+		m_AABB = AABB3((m_AABBOrignal.min + vector), (m_AABBOrignal.max + vector));
+	}
 
 	// apply rotation with controller
 	m_hAngle += -rStick.x * 35.0f * dt;

@@ -103,11 +103,12 @@ struct AABB3
 	glm::vec3 max;
 	float width;
 	float height;
+	float depth;
 	glm::vec3 center;
 
 	AABB3() : min(0), max(1) {}; ///< DO NOT USE UNLESS YOU WILL COMPUTE WIDTH/HEIGHT/CENTER!
 	AABB3(glm::vec3 minium, glm::vec3 maxium) : min(minium), max(maxium),
-																							width(maxium.x - minium.x), height(maxium.y - minium.y),
+																							width(maxium.x - minium.x), height(maxium.y - minium.y), depth(maxium.z - minium.z),
 																							center((maxium.x + minium.x) / 2, (maxium.y + minium.y) / 2, (maxium.z + minium.z) / 2) {};
 
 	bool contains(glm::vec3 one)
@@ -128,7 +129,7 @@ struct AABB3
 
 	bool intersect(AABB3 one)
 	{
-		if (glm::abs(one.center.z - center.z) < one.width / 2 + width / 2)
+		if (glm::abs(one.center.z - center.z) < one.depth / 2 + depth / 2)
 		{
 			if (glm::abs(one.center.x - center.x) < one.width / 2 + width / 2)
 			{
@@ -192,6 +193,9 @@ public:
 	inline AABB3 getAABB()
 	{ return m_AABB; }
 
+	inline void setAABB(AABB3 aabb)
+	{ m_AABB = aabb; }
+
 private:
 	rigidSkinnedMesh m_rMesh;
 	uint32_t m_vbo;
@@ -215,4 +219,5 @@ private:
 	glm::vec3 m_direction;
 	glm::quat m_facing;
 	AABB3 m_AABB;
+	AABB3 m_AABBOrignal;
 };
