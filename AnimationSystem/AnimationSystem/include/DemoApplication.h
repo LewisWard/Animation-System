@@ -68,7 +68,7 @@ private:
 	int m_eventCode;
 	XboxController m_controller;
 	glm::mat4 m_trajectoryJoint;
-	Object* m_object;
+	std::vector<Object*> m_object;
 	Texture* m_texture;
 	Texture* m_exoTexture;
 	bool* m_movement;

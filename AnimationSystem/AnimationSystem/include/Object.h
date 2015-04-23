@@ -14,7 +14,8 @@ class Object
 public:
 	///\brief Constructor
 	///\prama const char* mesh file name
-	Object(const char* meshFile);
+	///\prama const char* mesh collision file name
+	Object(const char* meshFile, const char* collisionFile);
 	///\brief Destructor
 	~Object();
 
@@ -24,8 +25,7 @@ public:
 	inline void matrix(glm::mat4 matrix)
 	{ m_matrix = matrix; }
 
-	inline void scale(glm::mat4 matrix)
-	{ m_matrix *= matrix; }
+	void scale(glm::mat4 matrix);
 
 	void translate(glm::vec3 vector);
 
@@ -36,6 +36,9 @@ public:
 	inline glm::mat4 matrix()
 	{ return m_matrix; }
 
+	inline AABB3 getAABB()
+	{ return m_AABB; }
+
 private:
 	std::vector<vertNormalUV> m_vertexData; ///< vertex data (vertex, normal, uv)
 	std::vector<int> m_indices; ///< indices
@@ -44,4 +47,5 @@ private:
 	glm::mat4 m_matrix; ///< model matrix
 	glm::vec3 m_dirX; ///< for working out the 'up' direction of the object
 	glm::vec3 m_dirY; ///< for working out the 'up' direction of the object
+	AABB3 m_AABB; ///< for collision detection
 };

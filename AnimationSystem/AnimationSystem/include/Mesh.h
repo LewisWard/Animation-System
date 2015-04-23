@@ -57,6 +57,92 @@ struct rigidSkinnedMesh
 	std::vector<vertNormalUV> meshData;
 };
 
+struct AABB2
+{
+	glm::vec2 min;
+	glm::vec2 max;
+	float width;
+	float height;
+	glm::vec2 center;
+
+	AABB2() : min(0), max(1) {}; ///< DO NOT USE UNLESS YOU WILL COMPUTE WIDTH/HEIGHT/CENTER!
+	AABB2(glm::vec2 minium, glm::vec2 maxium) : min(minium), max(maxium),
+																							width(maxium.x - minium.x), height(maxium.y - minium.y),
+																							center((maxium.x + minium.x) / 2, (maxium.y + minium.y) / 2) {};
+	bool contains(glm::vec2 one)
+	{
+		if (one.x >= min.x && one.x <= max.x)
+		{
+			if (one.y >= min.y && one.y <= max.y)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// based upon : http://gamedev.stackexchange.com/questions/60505/how-to-check-for-cube-collisions
+	bool intersect(AABB2 one)
+	{
+		if (glm::abs(one.center.x - center.x) < one.width / 2 + width / 2)
+		{
+			if (glm::abs(one.center.y - center.y) < one.height / 2 + height / 2)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+};
+
+struct AABB3
+{
+	glm::vec3 min;
+	glm::vec3 max;
+	float width;
+	float height;
+	glm::vec3 center;
+
+	AABB3() : min(0), max(1) {}; ///< DO NOT USE UNLESS YOU WILL COMPUTE WIDTH/HEIGHT/CENTER!
+	AABB3(glm::vec3 minium, glm::vec3 maxium) : min(minium), max(maxium),
+																							width(maxium.x - minium.x), height(maxium.y - minium.y),
+																							center((maxium.x + minium.x) / 2, (maxium.y + minium.y) / 2, (maxium.z + minium.z) / 2) {};
+
+	bool contains(glm::vec3 one)
+	{
+		if (one.z >= min.z && one.z <= max.z)
+		{
+			if (one.x >= min.x && one.x <= max.x)
+			{
+				if (one.y >= min.y && one.y <= max.y)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	bool intersect(AABB3 one)
+	{
+		if (glm::abs(one.center.z - center.z) < one.width / 2 + width / 2)
+		{
+			if (glm::abs(one.center.x - center.x) < one.width / 2 + width / 2)
+			{
+				if (glm::abs(one.center.y - center.y) < one.height / 2 + height / 2)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 /// \brief	Mesh that is loaded from 'amesh' (Animation Mesh) file
 //----------------------------------------------------------------------------------------------------------------------
@@ -65,7 +151,8 @@ class Mesh
 public:
 	/// \brief	ctor
 	/// \param const char* filename of the file that contains the rig (animation data)
-	Mesh(const char* rig);
+	///\prama const char* mesh collision file name
+	Mesh(const char* rig, const char* collisionFile);
 	/// \brief  dtor
 	~Mesh();
 
@@ -97,11 +184,13 @@ public:
 	{ return m_joints; }
 
 	inline float getHAngle()
-	{ return m_hAngle;
-	}
+	{ return m_hAngle; }
 
 	inline void hAngle(float h)
 	{ m_hAngle = h; }
+
+	inline AABB3 getAABB()
+	{ return m_AABB; }
 
 private:
 	rigidSkinnedMesh m_rMesh;
@@ -125,4 +214,5 @@ private:
 	float m_hAngle;
 	glm::vec3 m_direction;
 	glm::quat m_facing;
+	AABB3 m_AABB;
 };
