@@ -73,6 +73,10 @@ void gls::Program::uniform_1i(const char* uniformName, float value)
 {
 	glUniform1i(glGetUniformLocation(program(), uniformName), value);
 }
+void gls::Program::uniform_1f(const char* uniformName, float value)
+{
+	glUniform1f(glGetUniformLocation(program(), uniformName), value);
+}
 void gls::Program::uniform_4f(const char* uniformName, float floatZero, float floatOne, float floatTwo, float floatThree)
 {
 	glUniform4f(glGetUniformLocation(program(), uniformName), floatZero, floatOne, floatTwo, floatThree);

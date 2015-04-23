@@ -74,5 +74,6 @@ private:
 	Texture* m_bigTexture;
 	Texture* m_shopTexture;
 	Texture* m_houseTexture;
+	Texture* m_wallTexture;
 	bool* m_movement;
 };

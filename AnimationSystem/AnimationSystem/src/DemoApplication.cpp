@@ -24,22 +24,28 @@ Application::Application()
 	}
 	else
 	{
+		// load animated meshes, non-animated meshes and textures
 		m_mesh[0] = new Mesh(ANIMPATH"ExoIdle.amesh", "meshes/ExoCollision.meshes");
 		m_mesh[1] = new Mesh(ANIMPATH"ExoWalk.amesh", "meshes/ExoCollision.meshes");
 
-		m_object.resize(6);
+		m_object.resize(10);
 		m_object[0] = new Object("meshes/Building_Shop.meshes", "meshes/Building_ShopCollision.meshes");
 		m_object[1] = new Object("meshes/Floor.meshes", "meshes/Floor.meshes");
 		m_object[2] = new Object("meshes/Building_Big.meshes", "meshes/Building_BigCollision.meshes");
 		m_object[3] = new Object("meshes/Building_SmallHouse.meshes", "meshes/Building_SmallHouseCollision.meshes");
 		m_object[4] = new Object("meshes/Building_Flats.meshes", "meshes/Building_FlatsCollision.meshes");
-		m_object[5] = new Object("meshes/Wall.meshes", "meshes/WallCollision.meshes");
+		m_object[5] = new Object("meshes/Wall.meshes", "meshes/Wall.meshes");
+		m_object[6] = new Object("meshes/Wall.meshes", "meshes/Wall.meshes");
+		m_object[7] = new Object("meshes/Wall.meshes", "meshes/Wall.meshes");
+		m_object[8] = new Object("meshes/Wall.meshes", "meshes/Wall.meshes");
+		m_object[9] = new Object("meshes/Building_Shop.meshes", "meshes/Building_ShopCollision.meshes");
 
 		m_texture = new Texture("images/Floor.png");
 		m_exoTexture = new Texture("images/Exo.png");
 		m_bigTexture = new Texture("images/Big.png");
 		m_shopTexture = new Texture("images/Shop.png");
 		m_houseTexture = new Texture("images/Houses.png");
+		m_wallTexture = new Texture("images/Wall.png");
 
 		// scale and rotate the objects
 		glm::mat4 scale;
@@ -47,6 +53,7 @@ Application::Application()
 		scale[1].y = 5;
 		scale[2].z = 5;
 		m_object[0]->scale(scale);
+		m_object[9]->scale(scale);
 		scale[0].x = 105;
 		scale[1].y = 105;
 		scale[2].z = 105;
@@ -64,27 +71,46 @@ Application::Application()
 		scale[2].z = 5;
 		m_object[4]->scale(scale);
 
+		// walls
+		scale[0].x = 500;
+		scale[1].y = 50;
+		scale[2].z = 5;
+		m_object[5]->scale(scale);
+		m_object[6]->scale(scale);
+		scale[0].x = 5;
+		scale[1].y = 50;
+		scale[2].z = 500;
+		m_object[7]->scale(scale);
+		m_object[8]->scale(scale);
 
-		//m_object[0]->rotate(0.0f, 90.0f);
+		// apply translation and rotation
 		m_object[0]->translate(glm::vec3(-75.0f, 0.0f, -50.0f));
+		m_object[9]->rotate(0.0f, 180.0f);
+		m_object[9]->translate(glm::vec3(-110.0f, 0.0f, -50.0f));
 		m_object[1]->translate(glm::vec3(0.0f, 0.0f, 20.0f));
 		m_object[2]->translate(glm::vec3(58.0f, 0.0f, -30.0f));
 		m_object[3]->rotate(0.0f, 180.0f);
 		m_object[3]->translate(glm::vec3(-58.0f, 0.0f, 200.0f));
 		m_object[4]->rotate(0.0f, 180.0f);
-		m_object[4]->translate(glm::vec3(120.0f, 0.0f, 200.0f));
+		m_object[4]->translate(glm::vec3(225.0f, 0.0f, 200.0f));
+		m_object[5]->translate(glm::vec3(0.0f, 0.0f, 270.0f));
+		m_object[6]->translate(glm::vec3(0.0f, 0.0f, -200.0f));
+		m_object[7]->translate(glm::vec3(-250.0f, 0.0f, 40.0f));
+		m_object[8]->translate(glm::vec3(250.0f, 0.0f, 40.0f));
 
+		// create camera
 		m_camera = std::make_shared<Camera>(m_window.width(), m_window.height());
 
 		m_currentFrame = 0.0f;
 
+		// shader programs
 		m_program = new gls::Program();
 		m_objects = new gls::Program();
 
 		// create an array of all shaders to load
 		gls::Shader shaders[] = {
-			gls::Shader("shaders/joint.vtx.glsl", gls::sVERTEX), ///< joint vertex shader
-			gls::Shader("shaders/joint.pix.glsl", gls::sFRAGMENT), ///< joint fragment shader
+			gls::Shader("shaders/wall.vtx.glsl", gls::sVERTEX), ///< joint vertex shader
+			gls::Shader("shaders/wall.pix.glsl", gls::sFRAGMENT), ///< joint fragment shader
 			gls::Shader("shaders/object.vtx.glsl", gls::sVERTEX), ///< object vertex shader
 			gls::Shader("shaders/object.pix.glsl", gls::sFRAGMENT), ///< object fragment shader
 		};
@@ -101,6 +127,7 @@ Application::~Application()
 	delete m_bigTexture;
 	delete m_shopTexture;
 	delete m_houseTexture;
+	delete m_wallTexture;
 	delete m_program;
 	delete m_objects;
 	m_program = nullptr;
@@ -138,7 +165,7 @@ void Application::draw()
 
 	// bind program
 	m_objects->bind();
-		//bind texture
+		// bind textures
 		m_texture->bind(0);
 		m_exoTexture->bind(1);
 		m_bigTexture->bind(2);
@@ -163,24 +190,24 @@ void Application::draw()
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
 		m_objects->uniform_1i("texture", 3);
 		m_objects->uniform_4f("specular", 0.0f, 0.0f, 0.15f, 1.0f);
-		
+
 		// draw
 		m_object[0]->draw();
 
-		// recompute MV/MVP matrix
-		MV = V * m_object[1]->matrix();
+		MV = V * m_object[9]->matrix();
 		MVP = P * MV;
-		m_objects->uniform_1i("texture", 0);
 		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
-		m_object[1]->draw();
+		m_object[9]->draw();
+
+		// recompute MV/MVP matrix, set uniforms and draw objects
 		MV = V * m_object[3]->matrix();
 		MVP = P * MV;
 		m_objects->uniform_1i("texture", 4);
 		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
 		m_objects->uniform_Matrix4("mv", 1, false, MV);
 		m_object[3]->draw();
-		m_object[5]->draw();
+
 		MV = V * m_object[2]->matrix();
 		MVP = P * MV;
 		m_objects->uniform_1i("texture", 2);
@@ -194,17 +221,61 @@ void Application::draw()
 		m_objects->uniform_1i("texture", 3);
 		m_object[4]->draw();
 
-
-
-		// unbind texture
+		// unbind textures
 		m_texture->unbind();
 		m_exoTexture->unbind();
 		m_bigTexture->unbind();
 		m_shopTexture->unbind();
 		m_houseTexture->unbind();
+		m_wallTexture->unbind();
 
 	// unbind program
 	m_objects->unbind();
+
+	// bind program for walls
+	m_program->bind();
+
+		// bind textures
+		m_wallTexture->bind(5);
+
+		// floor
+		MV = V * m_object[1]->matrix();
+		MVP = P * MV;
+		m_objects->uniform_1i("texture", 0);
+		m_objects->uniform_Matrix4("mvp", 1, false, MVP);
+		m_objects->uniform_Matrix4("mv", 1, false, MV);
+		m_object[1]->draw();
+
+		// walls 
+		MV = V * m_object[5]->matrix();
+		MVP = P * MV;
+		m_program->uniform_1i("texture", 5);
+		m_program->uniform_1f("textureRepeat", 12.0f);
+		m_program->uniform_Matrix4("mvp", 1, false, MVP);
+		m_program->uniform_Matrix4("mv", 1, false, MV);
+		m_program->uniform_4f("ambient", 0.0f, 0.0f, 0.3f, 1.0f);
+		m_program->uniform_4f("diffuse", 1.0f, 1.0f, 1.0f, 1.0f);
+		m_program->uniform_4f("specular", 0.5f, 0.5f, 0.55f, 1.0f);
+		m_object[5]->draw();
+		MV = V * m_object[6]->matrix();
+		MVP = P * MV;
+		m_program->uniform_Matrix4("mvp", 1, false, MVP);
+		m_program->uniform_Matrix4("mv", 1, false, MV);
+		m_object[6]->draw();
+		MV = V * m_object[7]->matrix();
+		MVP = P * MV;
+		m_program->uniform_Matrix4("mvp", 1, false, MVP);
+		m_program->uniform_Matrix4("mv", 1, false, MV);
+		m_object[7]->draw();
+		MV = V * m_object[8]->matrix();
+		MVP = P * MV;
+		m_program->uniform_Matrix4("mvp", 1, false, MVP);
+		m_program->uniform_Matrix4("mv", 1, false, MV);
+		m_object[8]->draw();
+
+		m_wallTexture->unbind();
+
+	m_program->unbind();
 	
 
 	// disable OpenGL textures and depth testing
@@ -256,12 +327,12 @@ void Application::update(float dt)
 	// Debug builds only
 	#ifdef _DEBUG
 		// turn on fill
-		if (m_controller.getLastButtonPressed() == kX)
+		if (m_controller.getLastButtonPressed() == kX || m_eventCode == kCtrl) // X (Xbox controller) or Left Crtl for fill mode
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 		// turn on wirefire
-		if (m_controller.getLastButtonPressed() == kY)
+		if (m_controller.getLastButtonPressed() == kY || m_eventCode == kAlt) // Y (Xbox controller) or Left Alt for wireframe mode
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
