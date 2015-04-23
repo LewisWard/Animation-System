@@ -22,8 +22,22 @@ int Event::update()
 		case SDL_WINDOWEVENT:
 			break;
 		case SDL_KEYDOWN:
+				if (SDLK_ESCAPE == m_event.key.keysym.sym)
+				{ m_playState = false; } ///< quit window/program
+				if (SDLK_w == m_event.key.keysym.sym)
+				{ return kWdown; }
+				else if (SDLK_s == m_event.key.keysym.sym)
+				{ return kSdown; }
+				if (SDLK_a == m_event.key.keysym.sym)
+				{	return kAdown; }
+				else if(SDLK_d == m_event.key.keysym.sym)
+				{ return kDdown; }
+				else if (SDLK_q == m_event.key.keysym.sym)
+				{ return kQdown; }
+				else if (SDLK_e == m_event.key.keysym.sym)
+				{ return kEdown; }
 				if(SDLK_SPACE == m_event.key.keysym.sym)
-				{return kSpace;}
+				{ return kSpace; }
 				if (SDLK_LCTRL == m_event.key.keysym.sym)
 				{ return kCtrl; }
 				if (SDLK_LALT == m_event.key.keysym.sym)
@@ -32,6 +46,20 @@ int Event::update()
 				return kNONE;
 			break;
 		case SDL_KEYUP:
+			if (SDLK_w == m_event.key.keysym.sym)
+			{ return kWUp; }
+			else if (SDLK_s == m_event.key.keysym.sym)
+			{ return kSUp; }
+			if (SDLK_a == m_event.key.keysym.sym)
+			{ return kAUp; }
+			else if (SDLK_d == m_event.key.keysym.sym)
+			{ return kDUp; }
+			else if (SDLK_q == m_event.key.keysym.sym)
+			{ return kQUp; }
+			else if (SDLK_e == m_event.key.keysym.sym)
+			{ return kEUp; }
+			if (SDLK_SPACE == m_event.key.keysym.sym)
+			{ return kSpaceUp; }
 			break;
 		case SDL_MOUSEMOTION:
 			// update mouse position

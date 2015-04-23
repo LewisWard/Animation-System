@@ -39,7 +39,11 @@ public:
 	/// \prama const char* name of the uniform
 	/// \prama float value
 	void uniform_1i(const char* uniformName, float value);
-	
+
+	/// \brief set the uniform
+	/// \prama float value
+	void uniform_1f(const char* uniformName, float value);
+
 	/// \brief set the uniform
 	/// \prama const char* name of the uniform
 	/// \prama float X

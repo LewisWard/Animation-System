@@ -45,11 +45,19 @@ public:
 
 	XboxButtons getLastButtonPressed();
 
+	inline float getLeftTrigger()
+	{ return m_leftTrigger; }
+
+	inline float getRightTrigger()
+	{ return m_rightTrigger; }
+
 private:
 	DWORD m_dwReulst; ///< used to get result from XINPUT
 	XINPUT_STATE m_state; ///< the state of the controller
 	bool m_connected; ///< controller connected state
 	glm::vec2 m_leftStick; ///< left stick movement value
 	glm::vec2 m_rightStick; ///< right stick movement value
-	XboxButtons m_buttonPressed;
+	XboxButtons m_buttonPressed; ///< the button on controller
+	float m_leftTrigger;
+	float m_rightTrigger;
 };

@@ -77,8 +77,8 @@ Window::Window()
 		// set window position, width and height
 		m_winX = 150;
 		m_winY = 150;
-		m_winW = current.w / 2 + (current.w / 4);
-		m_winH = current.h / 2 + (current.h / 4);
+		m_winW = 1280; // current.w / 2 + (current.w / 4);
+		m_winH = 720; //current.h / 2 + (current.h / 4);
 	}
 	else
 	{
@@ -105,12 +105,12 @@ Window::Window()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	// multiply matrix with orthographic matrix
-	glOrtho(0, m_winW, m_winH, 0, 0, -250);
+	glOrtho(0, m_winW, m_winH, 0, 0.1f, 1000.0f);
 	// modelview matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	// clear screen to set colour
-	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+	glClearColor(0.28f, 0.63f, 0.78f, 0.0f);
 }
 Window::~Window()
 {
