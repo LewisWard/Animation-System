@@ -58,6 +58,6 @@ private:
 	glm::vec2 m_leftStick; ///< left stick movement value
 	glm::vec2 m_rightStick; ///< right stick movement value
 	XboxButtons m_buttonPressed; ///< the button on controller
-	float m_leftTrigger;
-	float m_rightTrigger;
+	float m_leftTrigger; ///< left trigger value
+	float m_rightTrigger; ///< right trigger value
 };

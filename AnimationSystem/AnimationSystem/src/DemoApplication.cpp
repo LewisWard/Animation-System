@@ -169,7 +169,6 @@ Application::~Application()
 	m_wallTexture = nullptr;
 	
 	delete[] m_movement;
-	m_movement = nullptr;
 
 	m_mesh[0]->~Mesh();
 	m_mesh[1]->~Mesh();
@@ -188,7 +187,6 @@ Application::~Application()
 
 	m_object.clear();
 	m_window.~Window();
-
 }
 void Application::draw()
 {
@@ -367,8 +365,6 @@ void Application::update(float dt)
 		m_movement[6] = true;
 	if (m_eventCode == kMDR)
 		m_movement[7] = true;
-
-	std::cout << m_events.mouseUpdate().x << " " << m_events.mouseUpdate().y << std::endl;
 
 	// if a menu, update menus others update the animation system
 	if (m_state != 2)

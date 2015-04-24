@@ -199,14 +199,8 @@ void Object::rotate(float x, float y)
 	scale.y = m_matrix[3].y;
 	scale.z = m_matrix[3].z;
 
-	std::cout << m_AABB.min.x << " " << m_AABB.min.y << " " << m_AABB.min.z << std::endl;
-	std::cout << m_AABB.max.x << " " << m_AABB.max.y << " " << m_AABB.max.z << std::endl;
-
 	glm::vec3 minScaled = glm::rotate(m_AABB.center, glm::radians(y), m_dirY);
 	glm::vec3 maxScaled = glm::rotate(m_AABB.max, glm::radians(y), m_dirY);
-
-	std::cout << minScaled.x << " " << minScaled.y << " " << minScaled.z << std::endl;
-	std::cout << maxScaled.x << " " << maxScaled.y << " " << maxScaled.z << std::endl;
 
 	m_AABB = AABB3(minScaled, maxScaled);
 }

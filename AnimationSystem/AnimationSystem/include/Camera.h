@@ -51,8 +51,19 @@ public:
 
 private:
 
+	/// \brief move the camera vertically
+	/// \prama float dt
+	/// \prama int distance
 	void verticalMove(float dt, int difference);
+
+	/// \brief move the camera horizontally
+	/// \prama float dt
+	/// \prama int distance
 	void horizontalMove(float dt, int difference);
+
+	/// \brief zoom the camera
+	/// \prama float dt
+	/// \prama int distance
 	void zoomMove(float dt, int difference);
 
 	float m_hAngle; ///< the horizontal angle of the camera 
