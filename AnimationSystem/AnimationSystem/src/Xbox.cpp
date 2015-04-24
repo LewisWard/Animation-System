@@ -128,14 +128,6 @@ void XboxController::update(float dt)
 		{
 			m_rightStick.y = 0.0f;
 		}
-
-		// only display in debug mode, otherwise console is spammed
-		#ifdef _DEBUG
-			if (m_leftStick.x > 0 || m_leftStick.y > 0)
-				std::cout << "L Stick: " << m_leftStick.x << " " << m_leftStick.y << std::endl;
-			if (m_rightStick.x > 0 || m_rightStick.y > 0)
-				std::cout << "R Stick: " << m_rightStick.x << " " << m_rightStick.y << std::endl;
-		#endif
 	}
 }
 XboxButtons XboxController::getLastButtonPressed()
