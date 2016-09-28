@@ -1,6 +1,7 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 12/02/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
 
 /*
 	This program will allow for users to export a Maya animation with the custom Maya exporter.
@@ -33,6 +34,7 @@ class Application
 public:
 	/// \brief Constructor
 	Application();
+
 	/// \brief Destructor
 	~Application();
 
@@ -55,26 +57,26 @@ private:
 
 	Window m_window; ///< demo window
 	Event m_events;  ///< demo user input events
-	Mesh* m_mesh[ANIMCOUNT];
-	animCycle m_currentState;
-	float m_currentFrame;
-	gls::Program* m_program;
-	gls::Program* m_objects;
-	gls::Program* m_menuProgram;
-	std::shared_ptr<Camera> m_camera;
-	int m_eventCode;
-	XboxController m_controller;
-	glm::mat4 m_trajectoryJoint;
-	std::vector<Object*> m_object;
-	Texture* m_texture;
-	Texture* m_exoTexture;
-	Texture* m_bigTexture;
-	Texture* m_shopTexture;
-	Texture* m_houseTexture;
-	Texture* m_wallTexture;
-	Texture* m_mainMenuTexture;
-	Texture* m_contMenuTexture;
-	bool* m_movement;
-	int m_state;
-	Menu* m_menu;
+	Mesh* m_mesh[ANIMCOUNT]; ///< the animation cycles, joint clusters etc.
+	animCycle m_currentState; ///< the current state the animation is in (i.e. Idle or Walking)
+	float m_currentFrame; ///< current frame
+	gls::Program* m_program; ///< shader program
+	gls::Program* m_objects; ///< shader program
+	gls::Program* m_menuProgram; ///< shader program
+	std::shared_ptr<Camera> m_camera; ///< camera
+	int m_eventCode; ///< input event codes
+	XboxController m_controller; ///< Xbox 360 Controller
+	glm::mat4 m_trajectoryJoint; ///< skeleton m_trajectory joint
+	std::vector<Object*> m_object; ///< non-animating 3D models (i.e. buildings)
+	Texture* m_texture; ///< texture
+	Texture* m_exoTexture; ///< texture
+	Texture* m_bigTexture; ///< texture
+	Texture* m_shopTexture; ///< texture
+	Texture* m_houseTexture; ///< texture
+	Texture* m_wallTexture; ///< texture 
+	Texture* m_mainMenuTexture; ///< texture
+	Texture* m_contMenuTexture; ///< texture
+	bool* m_movement; ///< array of current mouse/keyboard inputs
+	int m_state; ///< state the program is in
+	Menu* m_menu; ///< menu system
 };

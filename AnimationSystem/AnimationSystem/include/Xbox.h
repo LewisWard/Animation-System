@@ -1,6 +1,7 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 06/04/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
 #pragma once
 #include "Window.h"
 #include <Windows.h>
@@ -58,6 +59,6 @@ private:
 	glm::vec2 m_leftStick; ///< left stick movement value
 	glm::vec2 m_rightStick; ///< right stick movement value
 	XboxButtons m_buttonPressed; ///< the button on controller
-	float m_leftTrigger;
-	float m_rightTrigger;
+	float m_leftTrigger; ///< left trigger value
+	float m_rightTrigger; ///< right trigger value
 };

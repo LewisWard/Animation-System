@@ -1,6 +1,7 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 12/02/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
 #include "DemoApplication.h"
 
 #define ANIMPATH "./animations/"
@@ -167,9 +168,6 @@ Application::~Application()
 	m_shopTexture = nullptr;
 	m_houseTexture = nullptr;
 	m_wallTexture = nullptr;
-	
-	delete[] m_movement;
-	m_movement = nullptr;
 
 	m_mesh[0]->~Mesh();
 	m_mesh[1]->~Mesh();
@@ -188,7 +186,6 @@ Application::~Application()
 
 	m_object.clear();
 	m_window.~Window();
-
 }
 void Application::draw()
 {
@@ -367,8 +364,6 @@ void Application::update(float dt)
 		m_movement[6] = true;
 	if (m_eventCode == kMDR)
 		m_movement[7] = true;
-
-	std::cout << m_events.mouseUpdate().x << " " << m_events.mouseUpdate().y << std::endl;
 
 	// if a menu, update menus others update the animation system
 	if (m_state != 2)

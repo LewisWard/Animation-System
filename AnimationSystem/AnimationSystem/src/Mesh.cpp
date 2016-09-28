@@ -1,6 +1,7 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 20/02/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
 #include "Mesh.h"
 
 /* Animated Mesh (.amesh) file format:
@@ -10,7 +11,7 @@
 	 the Hips (provided named in Maya) without the Trajectory or Hips joint the plugin will crash Maya!
 	 Any other joint after the first 2 joints can be called anything you like.
 
-	 NOTE: make sure the nmber of vertices is divisible by 3, otherwise the plugin will throw an expection
+	 NOTE: make sure the number of vertices is divisible by 3, otherwise the plugin will throw an exception
 	 and crash Maya as it cannot output a set (triple) of indices!
 
 // ------------------------------------------  File structure  ------------------------------------------ //

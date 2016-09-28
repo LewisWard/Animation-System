@@ -1,6 +1,7 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 09/03/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
 #pragma once
 #include "Events.h"
 #include "Xbox.h"
@@ -51,8 +52,19 @@ public:
 
 private:
 
+	/// \brief move the camera vertically
+	/// \prama float dt
+	/// \prama int distance
 	void verticalMove(float dt, int difference);
+
+	/// \brief move the camera horizontally
+	/// \prama float dt
+	/// \prama int distance
 	void horizontalMove(float dt, int difference);
+
+	/// \brief zoom the camera
+	/// \prama float dt
+	/// \prama int distance
 	void zoomMove(float dt, int difference);
 
 	float m_hAngle; ///< the horizontal angle of the camera 

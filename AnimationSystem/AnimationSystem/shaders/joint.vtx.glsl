@@ -1,6 +1,7 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 04/04/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
 
 #version 330 ///< shader version
 layout(location = 0) in vec4 position; ///< the vertex co-odinate from VBO
