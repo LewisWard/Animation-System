@@ -4,6 +4,8 @@ Copyright (C) 2015-2016 Lewis Ward, All rights reserved. (lewis.ward@outlook.com
 
 For 3rd party libraries (i.e. Glew) see either their README or header file for copyright and notices.
 
+There are **2 different branches** that you can use to download/clone from, *master branch* contains all of the code, libs etc. you will need. However, if you are a **Visual Studio User** download/clone from the *VisualStudioVersion branch* as this will also include a VS project set up so you should just be able to open the project and build it.
+
 The project uses two different custom Maya Plugins for exporting objects, a file exported that ends in '.amesh' is from my plugin. Files exported ending in '.meshes' is not from my plugin, this is a 3rd party plugin, as a result, this plugin and its source code are not provided (the exported meshes have been provided).
 
 Modification of any source code, which is mine and not third party, is not permitted. 
