@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="include\gl">
+      <UniqueIdentifier>{de240c74-ce43-4927-8f95-9c317b68d195}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{95dce4ac-3fe1-4d7a-8b01-1893aff04f3b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Program.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glew.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DemoApplication.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Events.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Xbox.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Object.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Menu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\gl\glew.h">
+      <Filter>include\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gl\Program.h">
+      <Filter>include\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gl\Shader.h">
+      <Filter>include\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gl\wglew.h">
+      <Filter>include\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DemoApplication.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Events.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Texture.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Camera.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Xbox.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Object.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Menu.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\joint.pix.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\joint.vtx.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\object.pix.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\object.vtx.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\wall.pix.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\wall.vtx.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\flatImage.pix.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaders\flatImage.vtx.glsl">
+      <Filter>shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
