@@ -1,6 +1,7 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 20/02/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
 #pragma once
 #include "Texture.h"
 #include "Events.h"

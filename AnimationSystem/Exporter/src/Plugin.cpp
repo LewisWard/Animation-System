@@ -1,6 +1,8 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 20/02/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
+
 // a helpful resource : http://nccastaff.bournemouth.ac.uk/jmacey/RobTheBloke/www/research/maya/exp_plugin.htm
 #include "PGAGExporter.h"
 #include <maya/MFnPlugin.h>

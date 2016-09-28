@@ -1,6 +1,8 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 20/02/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
+
 // Maya plugin bases upon 'AnimExporter', 'AnimationBlending' by Rob Bateman and resources found at:
 // http://nccastaff.bournemouth.ac.uk/jmacey/RobTheBloke/www/research/index.htm
 // also the Maya API Reference Documentation : http://download.autodesk.com/us/maya/2009help/API/main.html

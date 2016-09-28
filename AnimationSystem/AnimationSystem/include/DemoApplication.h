@@ -1,6 +1,7 @@
-// Author  : Lewis Ward
+// Author : Lewis Ward (http://www.lewis-ward.com)
 // Program : Animation System Tech Demo
 // Date    : 12/02/2015
+// © 2015-2016 Lewis Ward. All rights reserved.
 
 /*
 	This program will allow for users to export a Maya animation with the custom Maya exporter.
