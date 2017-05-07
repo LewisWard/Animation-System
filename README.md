@@ -14,7 +14,7 @@ I've done my best to resolve all bugs I've found but if you download any part of
 
 ### What is this repository for? ###
 
-* Summary : A C++/OpenGL 3D Animation System that allows the user to import Rigid Skinned objects from Maya. There are two main parts to this animation system, the first being the Maya plugin that allows animated objects to be export from a Maya scene and the second is the C++/OpenGL program at loads the exported objects into a game scene. For more details go to: [http://www.lewis-ward.com/animation-system.html](Link URL)
+* Summary : A C++/OpenGL 3D Animation System that allows the user to import Rigid Skinned objects from Maya. There are two main parts to this animation system, the first being the Maya plugin that allows animated objects to be export from a Maya scene and the second is the C++/OpenGL program at loads the exported objects into a game scene. For more details go to: [www.lewis-ward.com/animation-system](http://www.lewis-ward.com/animation-system.html)
 * Version : 1.0.1
 
 ### How do I get set up? ###
@@ -25,5 +25,5 @@ I've done my best to resolve all bugs I've found but if you download any part of
 
 ### Contribution guidelines ###
 
-* I'm a very busy person but if you encounter any bugs please do send me a message with details about it, I'll see what I can do. You can also get in contact with me via my website: [http://www.lewis-ward.com/contact.html](Link URL)
+* I'm a very busy person but if you encounter any bugs please do send me a message with details about it, I'll see what I can do. You can also get in contact with me via my website: [www.lewis-ward.com/contact](http://www.lewis-ward.com/contact.html)
 * If you have any constructive feedback, good or bad, also please message me. I would like to know what I've done well and areas to be improved on. Although I'm not looking for feature requests due to my lack of free time.
