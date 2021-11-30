@@ -1,6 +1,6 @@
 # C++ Animation System Readme #
 
-Copyright (C) 2015-2016 Lewis Ward, All rights reserved. (lewis.ward@outlook.com)
+Copyright (C) 2015-2016 Lewis Ward, All rights reserved.
 
 For 3rd party libraries (i.e. Glew) see either their README or header file for copyright and notices.
 
